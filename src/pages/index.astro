@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Home" description="AI Research Portfolio and Blog by Dr. Sanjeeva Dodlapati">
+  <div class="text-center py-16">
+    <h1 class="text-5xl font-bold text-gray-900 mb-6">
+      Welcome to My Academic Portfolio
+    </h1>
+    <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+      AI Researcher • Bioinformatics Expert • Computational Biology Specialist
+    </p>
+    <p class="text-lg text-gray-700 max-w-4xl mx-auto leading-relaxed">
+      Exploring the intersection of artificial intelligence, machine learning, and biological systems. 
+      This portfolio showcases my research, publications, and insights in computational biology, 
+      bioinformatics, and AI applications in life sciences.
+    </p>
+    
+    <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold text-gray-900 mb-3">Research</h3>
+        <p class="text-gray-600">
+          Cutting-edge research in AI applications for biological data analysis and drug discovery.
+        </p>
+        <a href="/research" class="mt-4 inline-block text-blue-600 hover:text-blue-800 font-medium">
+          View Research →
+        </a>
+      </div>
+      
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold text-gray-900 mb-3">Experience</h3>
+        <p class="text-gray-600">
+          Academic and industry experience in computational biology and machine learning.
+        </p>
+        <a href="/experience" class="mt-4 inline-block text-blue-600 hover:text-blue-800 font-medium">
+          View Experience →
+        </a>
+      </div>
+      
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold text-gray-900 mb-3">Blog</h3>
+        <p class="text-gray-600">
+          Technical tutorials, research insights, and thoughts on the future of AI in biology.
+        </p>
+        <a href="/blog" class="mt-4 inline-block text-blue-600 hover:text-blue-800 font-medium">
+          Read Blog →
+        </a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

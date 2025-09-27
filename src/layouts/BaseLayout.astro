@@ -1,0 +1,51 @@
+---
+export interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Modern AI Research Portfolio and Blog" } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title} | Dr. Sanjeeva Dodlapati</title>
+  <meta name="description" content={description}>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <meta name="generator" content={Astro.generator}>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+  <nav class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <a href="/" class="text-xl font-bold text-gray-900">Dr. Sanjeeva Dodlapati</a>
+        </div>
+        <div class="flex items-center space-x-8">
+          <a href="/" class="text-gray-700 hover:text-blue-600 transition-colors">Home</a>
+          <a href="/research" class="text-gray-700 hover:text-blue-600 transition-colors">Research</a>
+          <a href="/experience" class="text-gray-700 hover:text-blue-600 transition-colors">Experience</a>
+          <a href="/blog" class="text-gray-700 hover:text-blue-600 transition-colors">Blog</a>
+          <a href="/contact" class="text-gray-700 hover:text-blue-600 transition-colors">Contact</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+  
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <slot />
+  </main>
+  
+  <footer class="bg-gray-800 text-white py-12 mt-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <p>&copy; 2025 Dr. Sanjeeva Dodlapati. All rights reserved.</p>
+        <p class="mt-2 text-gray-400">AI Research • Bioinformatics • Computational Biology</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

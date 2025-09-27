@@ -1,0 +1,26 @@
+{
+  "name": "ai-science-portfolio",
+  "version": "1.0.0",
+  "description": "> Modern, interactive portfolio and blog platform for AI research, bioinformatics, and computational biology",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@astrojs/mdx": "^4.3.6",
+    "@astrojs/sitemap": "^3.6.0",
+    "@astrojs/tailwind": "^6.0.2",
+    "@tailwindcss/typography": "^0.5.19",
+    "astro": "^5.14.1",
+    "tailwindcss": "^3.4.17"
+  }
+}
