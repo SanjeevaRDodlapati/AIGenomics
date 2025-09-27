@@ -1,0 +1,184 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: post,
+  }));
+}
+
+const post = Astro.props;
+const { Content } = await post.render();
+
+const formattedDate = new Date(post.data.pubDate).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+---
+
+<BaseLayout title={`${post.data.title} - Dr. Sanjeeva Reddy Dodlapati`}>
+  <main class="max-w-4xl mx-auto px-4 py-8">
+    <!-- Back to Blog -->
+    <nav class="mb-8">
+      <a 
+        href="/blog" 
+        class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors"
+      >
+        <svg class="mr-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to Blog
+      </a>
+    </nav>
+
+    <!-- Article Header -->
+    <header class="mb-12">
+      <h1 class="text-4xl font-bold text-gray-900 mb-6 leading-tight">
+        {post.data.title}
+      </h1>
+      
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+        <div class="flex items-center text-gray-500 space-x-4">
+          <time datetime={post.data.pubDate.toISOString()}>
+            {formattedDate}
+          </time>
+          <span>•</span>
+          <span>{post.data.author || 'Dr. Sanjeeva Reddy Dodlapati'}</span>
+        </div>
+        
+        {post.data.tags && (
+          <div class="flex flex-wrap gap-2">
+            {post.data.tags.map((tag) => (
+              <span class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+      
+      {post.data.description && (
+        <p class="text-xl text-gray-600 leading-relaxed border-l-4 border-blue-200 pl-6 italic">
+          {post.data.description}
+        </p>
+      )}
+    </header>
+
+    <!-- Article Content -->
+    <article class="prose prose-lg prose-blue max-w-none">
+      <Content />
+    </article>
+
+    <!-- Article Footer -->
+    <footer class="mt-12 pt-8 border-t border-gray-200">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Author Bio -->
+        <div class="bg-gray-50 p-6 rounded-lg">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">About the Author</h3>
+          <p class="text-gray-600 mb-4">
+            Dr. Sanjeeva Reddy Dodlapati is a researcher and practitioner in AI and data science,
+            focusing on the practical application of machine learning technologies in real-world scenarios.
+          </p>
+          <div class="flex space-x-4">
+            <a href="/experience" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+              View Experience
+            </a>
+            <a href="/research" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+              Research Profile
+            </a>
+          </div>
+        </div>
+        
+        <!-- Share & Subscribe -->
+        <div class="bg-blue-50 p-6 rounded-lg">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">Enjoyed this post?</h3>
+          <p class="text-gray-600 mb-4">
+            Subscribe to get notified of new insights about AI research, data science,
+            and technology applications.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <a 
+              href="/contact" 
+              class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-center"
+            >
+              Subscribe
+            </a>
+            <a 
+              href="/blog" 
+              class="border border-blue-600 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors text-center"
+            >
+              More Posts
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </main>
+</BaseLayout>
+
+<style>
+  /* Custom prose styles for better readability */
+  .prose {
+    @apply text-gray-700;
+  }
+  
+  .prose h2 {
+    @apply text-2xl font-semibold text-gray-900 mt-8 mb-4 border-b border-gray-200 pb-2;
+  }
+  
+  .prose h3 {
+    @apply text-xl font-semibold text-gray-900 mt-6 mb-3;
+  }
+  
+  .prose p {
+    @apply mb-4 leading-relaxed;
+  }
+  
+  .prose ul, .prose ol {
+    @apply mb-4 ml-6;
+  }
+  
+  .prose li {
+    @apply mb-2;
+  }
+  
+  .prose blockquote {
+    @apply border-l-4 border-blue-200 pl-6 italic text-gray-600 my-6;
+  }
+  
+  .prose code {
+    @apply bg-gray-100 px-2 py-1 rounded text-sm font-mono;
+  }
+  
+  .prose pre {
+    @apply bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto my-6;
+  }
+  
+  .prose pre code {
+    @apply bg-transparent p-0;
+  }
+  
+  .prose a {
+    @apply text-blue-600 hover:text-blue-700 underline;
+  }
+  
+  .prose img {
+    @apply rounded-lg shadow-md;
+  }
+  
+  .prose table {
+    @apply w-full border-collapse border border-gray-300 my-6;
+  }
+  
+  .prose th, .prose td {
+    @apply border border-gray-300 px-4 py-2 text-left;
+  }
+  
+  .prose th {
+    @apply bg-gray-50 font-semibold;
+  }
+</style>

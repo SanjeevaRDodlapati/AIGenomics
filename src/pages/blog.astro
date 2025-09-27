@@ -1,0 +1,124 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog');
+const sortedPosts = posts.sort((a, b) => new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf());
+---
+
+<BaseLayout title="Blog - Dr. Sanjeeva Reddy Dodlapati">
+  <main class="max-w-4xl mx-auto px-4 py-8">
+    <header class="mb-12">
+      <h1 class="text-4xl font-bold text-gray-900 mb-4">Blog</h1>
+      <p class="text-xl text-gray-600 leading-relaxed">
+        Insights, discoveries, and thoughts on AI, data science, and the intersection
+        of technology with real-world applications. Updated weekly with new perspectives.
+      </p>
+    </header>
+
+    {sortedPosts.length === 0 ? (
+      <div class="text-center py-12">
+        <div class="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
+          <h2 class="text-2xl font-semibold text-gray-900 mb-4">Coming Soon!</h2>
+          <p class="text-gray-600 mb-6">
+            I'm preparing thoughtful content about AI research, data science insights,
+            and practical applications. Check back soon for regular updates.
+          </p>
+          <a 
+            href="/contact" 
+            class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Get Notified of New Posts
+          </a>
+        </div>
+      </div>
+    ) : (
+      <section class="space-y-8">
+        {sortedPosts.map((post) => {
+          const formattedDate = new Date(post.data.pubDate).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
+          
+          return (
+            <article class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+              <header class="mb-4">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-2">
+                  <a 
+                    href={`/blog/${post.slug}`} 
+                    class="hover:text-blue-600 transition-colors"
+                  >
+                    {post.data.title}
+                  </a>
+                </h2>
+                <div class="flex items-center text-sm text-gray-500 space-x-4">
+                  <time datetime={post.data.pubDate.toISOString()}>
+                    {formattedDate}
+                  </time>
+                  <span>•</span>
+                  <span>{post.data.author || 'Dr. Sanjeeva Reddy Dodlapati'}</span>
+                  {post.data.tags && (
+                    <>
+                      <span>•</span>
+                      <div class="flex space-x-2">
+                        {post.data.tags.slice(0, 2).map((tag) => (
+                          <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                            {tag}
+                          </span>
+                        ))}
+                        {post.data.tags.length > 2 && (
+                          <span class="text-gray-400 text-xs">+{post.data.tags.length - 2} more</span>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </header>
+              
+              <div class="mb-4">
+                <p class="text-gray-600 leading-relaxed">
+                  {post.data.description || 'Click to read the full post and discover insights about AI, data science, and technology applications.'}
+                </p>
+              </div>
+              
+              <footer>
+                <a 
+                  href={`/blog/${post.slug}`} 
+                  class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                >
+                  Read More
+                  <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </a>
+              </footer>
+            </article>
+          );
+        })}
+      </section>
+    )}
+
+    <aside class="mt-12 pt-8 border-t border-gray-200">
+      <div class="bg-blue-50 p-6 rounded-lg">
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">Subscribe to Updates</h3>
+        <p class="text-gray-600 mb-4">
+          Get notified when I publish new insights about AI research, data science applications,
+          and technology trends. No spam, just valuable content.
+        </p>
+        <a 
+          href="/contact" 
+          class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Contact Me
+        </a>
+      </div>
+    </aside>
+  </main>
+</BaseLayout>
+
+<style>
+  article:hover {
+    transform: translateY(-2px);
+  }
+</style>
