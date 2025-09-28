@@ -1,0 +1,440 @@
+---
+// Performance Monitor Component - Phase 3 Advanced Analytics
+// Tracks Core Web Vitals and provides performance insights
+interface Props {
+  trackingEnabled?: boolean;
+  showWidget?: boolean;
+  debugMode?: boolean;
+}
+
+const { 
+  trackingEnabled = true, 
+  showWidget = false,
+  debugMode = false 
+} = Astro.props;
+---
+
+{showWidget && (
+  <div id="performance-widget" class="fixed bottom-4 right-4 z-50 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-64 transform transition-transform duration-300 translate-x-full">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-sm font-semibold text-gray-900">Performance</h3>
+      <button id="toggle-widget" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="space-y-2 text-xs">
+      <div class="flex justify-between">
+        <span>LCP:</span>
+        <span id="lcp-value" class="font-mono">-</span>
+      </div>
+      <div class="flex justify-between">
+        <span>FID:</span>
+        <span id="fid-value" class="font-mono">-</span>
+      </div>
+      <div class="flex justify-between">
+        <span>CLS:</span>
+        <span id="cls-value" class="font-mono">-</span>
+      </div>
+      <div class="flex justify-between">
+        <span>FCP:</span>
+        <span id="fcp-value" class="font-mono">-</span>
+      </div>
+    </div>
+    
+    <div class="mt-3 pt-3 border-t border-gray-200">
+      <div class="flex justify-between text-xs">
+        <span>Page Load:</span>
+        <span id="load-time" class="font-mono">-</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Toggle Button -->
+  <button 
+    id="performance-toggle"
+    class="fixed bottom-4 right-4 z-50 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+    title="Performance Monitor"
+  >
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+    </svg>
+  </button>
+)}
+
+<script define:vars={{ trackingEnabled, showWidget, debugMode }}>
+  // Performance Monitor - Core Web Vitals Tracking
+  class PerformanceMonitor {
+    constructor(trackingEnabled, showWidget, debugMode) {
+      this.trackingEnabled = trackingEnabled;
+      this.showWidget = showWidget;
+      this.debugMode = debugMode;
+      
+      this.metrics = {
+        lcp: null,
+        fid: null,
+        cls: null,
+        fcp: null,
+        ttfb: null,
+        loadTime: null
+      };
+      
+      this.observers = [];
+      
+      if (this.trackingEnabled) {
+        this.initializeTracking();
+      }
+      
+      if (this.showWidget) {
+        this.initializeWidget();
+      }
+    }
+    
+    initializeTracking() {
+      // Track Core Web Vitals
+      this.trackLCP();
+      this.trackFID();
+      this.trackCLS();
+      this.trackFCP();
+      this.trackTTFB();
+      this.trackLoadTime();
+      
+      // Track Navigation Timing
+      this.trackNavigationTiming();
+      
+      // Track Resource Timing
+      this.trackResourceTiming();
+      
+      if (this.debugMode) {
+        console.log('Performance Monitor initialized');
+      }
+    }
+    
+    trackLCP() {
+      if ('PerformanceObserver' in window) {
+        try {
+          const observer = new PerformanceObserver((list) => {
+            const entries = list.getEntries();
+            const lastEntry = entries[entries.length - 1];
+            
+            this.metrics.lcp = Math.round(lastEntry.startTime);
+            this.updateWidget('lcp', `${this.metrics.lcp}ms`);
+            this.sendMetric('LCP', this.metrics.lcp);
+            
+            if (this.debugMode) {
+              console.log('LCP:', this.metrics.lcp);
+            }
+          });
+          
+          observer.observe({ entryTypes: ['largest-contentful-paint'] });
+          this.observers.push(observer);
+        } catch (e) {
+          if (this.debugMode) console.warn('LCP tracking failed:', e);
+        }
+      }
+    }
+    
+    trackFID() {
+      if ('PerformanceObserver' in window) {
+        try {
+          const observer = new PerformanceObserver((list) => {
+            const firstInput = list.getEntries()[0];
+            if (firstInput) {
+              this.metrics.fid = Math.round(firstInput.processingStart - firstInput.startTime);
+              this.updateWidget('fid', `${this.metrics.fid}ms`);
+              this.sendMetric('FID', this.metrics.fid);
+              
+              if (this.debugMode) {
+                console.log('FID:', this.metrics.fid);
+              }
+            }
+          });
+          
+          observer.observe({ entryTypes: ['first-input'] });
+          this.observers.push(observer);
+        } catch (e) {
+          if (this.debugMode) console.warn('FID tracking failed:', e);
+        }
+      }
+    }
+    
+    trackCLS() {
+      if ('PerformanceObserver' in window) {
+        try {
+          let clsValue = 0;
+          let clsEntries = [];
+          
+          const observer = new PerformanceObserver((list) => {
+            const entries = list.getEntries();
+            
+            entries.forEach((entry) => {
+              if (!entry.hadRecentInput) {
+                const firstSessionEntry = clsEntries[0];
+                const lastSessionEntry = clsEntries[clsEntries.length - 1];
+                
+                if (!firstSessionEntry || 
+                    entry.startTime - lastSessionEntry.startTime > 1000 ||
+                    entry.startTime - firstSessionEntry.startTime > 5000) {
+                  clsEntries = [entry];
+                } else {
+                  clsEntries.push(entry);
+                }
+                
+                clsValue = clsEntries.reduce((sum, entry) => sum + entry.value, 0);
+                this.metrics.cls = Math.round(clsValue * 1000) / 1000;
+                this.updateWidget('cls', this.metrics.cls.toFixed(3));
+                this.sendMetric('CLS', this.metrics.cls);
+                
+                if (this.debugMode) {
+                  console.log('CLS:', this.metrics.cls);
+                }
+              }
+            });
+          });
+          
+          observer.observe({ entryTypes: ['layout-shift'] });
+          this.observers.push(observer);
+        } catch (e) {
+          if (this.debugMode) console.warn('CLS tracking failed:', e);
+        }
+      }
+    }
+    
+    trackFCP() {
+      if ('PerformanceObserver' in window) {
+        try {
+          const observer = new PerformanceObserver((list) => {
+            const entries = list.getEntries();
+            const fcpEntry = entries.find(entry => entry.name === 'first-contentful-paint');
+            
+            if (fcpEntry) {
+              this.metrics.fcp = Math.round(fcpEntry.startTime);
+              this.updateWidget('fcp', `${this.metrics.fcp}ms`);
+              this.sendMetric('FCP', this.metrics.fcp);
+              
+              if (this.debugMode) {
+                console.log('FCP:', this.metrics.fcp);
+              }
+            }
+          });
+          
+          observer.observe({ entryTypes: ['paint'] });
+          this.observers.push(observer);
+        } catch (e) {
+          if (this.debugMode) console.warn('FCP tracking failed:', e);
+        }
+      }
+    }
+    
+    trackTTFB() {
+      if ('performance' in window && performance.timing) {
+        window.addEventListener('load', () => {
+          const navigation = performance.getEntriesByType('navigation')[0];
+          if (navigation) {
+            this.metrics.ttfb = Math.round(navigation.responseStart - navigation.fetchStart);
+            this.sendMetric('TTFB', this.metrics.ttfb);
+            
+            if (this.debugMode) {
+              console.log('TTFB:', this.metrics.ttfb);
+            }
+          }
+        });
+      }
+    }
+    
+    trackLoadTime() {
+      window.addEventListener('load', () => {
+        const loadTime = Math.round(performance.now());
+        this.metrics.loadTime = loadTime;
+        this.updateWidget('load-time', `${loadTime}ms`);
+        this.sendMetric('LoadTime', loadTime);
+        
+        if (this.debugMode) {
+          console.log('Load Time:', loadTime);
+        }
+      });
+    }
+    
+    trackNavigationTiming() {
+      window.addEventListener('load', () => {
+        if ('performance' in window && performance.timing) {
+          const timing = performance.timing;
+          
+          const metrics = {
+            dns: timing.domainLookupEnd - timing.domainLookupStart,
+            tcp: timing.connectEnd - timing.connectStart,
+            request: timing.responseStart - timing.requestStart,
+            response: timing.responseEnd - timing.responseStart,
+            dom: timing.domComplete - timing.domLoading
+          };
+          
+          if (this.debugMode) {
+            console.log('Navigation Timing:', metrics);
+          }
+          
+          // Send aggregated navigation metrics
+          this.sendMetric('NavigationTiming', metrics);
+        }
+      });
+    }
+    
+    trackResourceTiming() {
+      window.addEventListener('load', () => {
+        const resources = performance.getEntriesByType('resource');
+        const resourceSummary = {
+          total: resources.length,
+          css: resources.filter(r => r.name.includes('.css')).length,
+          js: resources.filter(r => r.name.includes('.js')).length,
+          images: resources.filter(r => /\.(jpg|jpeg|png|gif|svg|webp)/.test(r.name)).length,
+          fonts: resources.filter(r => /\.(woff|woff2|ttf|otf)/.test(r.name)).length
+        };
+        
+        if (this.debugMode) {
+          console.log('Resource Summary:', resourceSummary);
+        }
+        
+        this.sendMetric('Resources', resourceSummary);
+      });
+    }
+    
+    sendMetric(name, value) {
+      // Send to analytics (Google Analytics, custom endpoint, etc.)
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'core_web_vital', {
+          'custom_parameter_1': name,
+          'value': typeof value === 'object' ? JSON.stringify(value) : value
+        });
+      }
+      
+      // Store locally for debugging/analysis
+      const perfData = JSON.parse(localStorage.getItem('perf_metrics') || '[]');
+      perfData.push({
+        metric: name,
+        value: value,
+        timestamp: Date.now(),
+        url: window.location.pathname
+      });
+      
+      // Keep only last 100 entries
+      if (perfData.length > 100) {
+        perfData.splice(0, perfData.length - 100);
+      }
+      
+      localStorage.setItem('perf_metrics', JSON.stringify(perfData));
+    }
+    
+    updateWidget(metric, value) {
+      if (this.showWidget) {
+        const element = document.getElementById(`${metric}-value`);
+        if (element) {
+          element.textContent = value;
+          
+          // Color coding based on performance thresholds
+          element.className = 'font-mono ' + this.getPerformanceColor(metric, value);
+        }
+      }
+    }
+    
+    getPerformanceColor(metric, value) {
+      const numValue = parseInt(value) || parseFloat(value) || 0;
+      
+      switch (metric) {
+        case 'lcp':
+          return numValue <= 2500 ? 'text-green-600' : numValue <= 4000 ? 'text-yellow-600' : 'text-red-600';
+        case 'fid':
+          return numValue <= 100 ? 'text-green-600' : numValue <= 300 ? 'text-yellow-600' : 'text-red-600';
+        case 'cls':
+          return numValue <= 0.1 ? 'text-green-600' : numValue <= 0.25 ? 'text-yellow-600' : 'text-red-600';
+        case 'fcp':
+          return numValue <= 1800 ? 'text-green-600' : numValue <= 3000 ? 'text-yellow-600' : 'text-red-600';
+        default:
+          return 'text-gray-600';
+      }
+    }
+    
+    initializeWidget() {
+      const widget = document.getElementById('performance-widget');
+      const toggle = document.getElementById('performance-toggle');
+      const closeBtn = document.getElementById('toggle-widget');
+      
+      if (toggle && widget) {
+        toggle.addEventListener('click', () => {
+          widget.style.transform = 'translateX(0)';
+          toggle.style.display = 'none';
+        });
+      }
+      
+      if (closeBtn && widget) {
+        closeBtn.addEventListener('click', () => {
+          widget.style.transform = 'translateX(100%)';
+          if (toggle) toggle.style.display = 'block';
+        });
+      }
+    }
+    
+    getMetricsSummary() {
+      return {
+        ...this.metrics,
+        timestamp: Date.now(),
+        url: window.location.pathname,
+        userAgent: navigator.userAgent,
+        connection: navigator.connection ? {
+          effectiveType: navigator.connection.effectiveType,
+          downlink: navigator.connection.downlink,
+          rtt: navigator.connection.rtt
+        } : null
+      };
+    }
+    
+    exportMetrics() {
+      const summary = this.getMetricsSummary();
+      const blob = new Blob([JSON.stringify(summary, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `performance-metrics-${Date.now()}.json`;
+      a.click();
+      
+      URL.revokeObjectURL(url);
+    }
+    
+    cleanup() {
+      this.observers.forEach(observer => {
+        try {
+          observer.disconnect();
+        } catch (e) {
+          if (this.debugMode) console.warn('Failed to disconnect observer:', e);
+        }
+      });
+    }
+  }
+  
+  // Initialize Performance Monitor
+  let perfMonitor;
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    perfMonitor = new PerformanceMonitor(trackingEnabled, showWidget, debugMode);
+    
+    // Expose to global scope for debugging
+    if (debugMode) {
+      window.perfMonitor = perfMonitor;
+    }
+  });
+  
+  // Cleanup on page unload
+  window.addEventListener('beforeunload', () => {
+    if (perfMonitor) {
+      perfMonitor.cleanup();
+    }
+  });
+  
+  // Expose export function globally
+  window.exportPerformanceMetrics = () => {
+    if (perfMonitor) {
+      perfMonitor.exportMetrics();
+    }
+  };
+</script>

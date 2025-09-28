@@ -1,24 +1,28 @@
 ---
-export interface Props {
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import PerformanceMonitor from '../components/PerformanceMonitor.astro';
+
+interface Props {
   title: string;
   description?: string;
-  image?: string;
-  canonical?: string;
-  noindex?: boolean;
+  ogImage?: string;
+  canonicalURL?: URL;
+  showPerformanceWidget?: boolean;
 }
 
 const { 
   title, 
-  description = "Machine Learning and AI for Genomics, Computational Biology, and Drug Discovery",
-  image = "/images/og-default.jpg",
-  canonical,
-  noindex = false
+  description = "AI Research Portfolio and Blog by Dr. Sanjeeva Reddy Dodlapati", 
+  ogImage = "/og-default.jpg",
+  canonicalURL,
+  showPerformanceWidget = false
 } = Astro.props;
 
 const baseUrl = import.meta.env.BASE_URL;
 const siteUrl = "https://sanjeevardodlapati.github.io";
-const fullUrl = canonical || `${siteUrl}${baseUrl}${Astro.url.pathname}`;
-const ogImage = `${siteUrl}${baseUrl}${image}`;
+const fullUrl = canonicalURL || `${siteUrl}${baseUrl}${Astro.url.pathname}`;
+const fullOgImage = `${siteUrl}${baseUrl}${ogImage}`;
 ---
 
 <!DOCTYPE html>
@@ -34,15 +38,14 @@ const ogImage = `${siteUrl}${baseUrl}${image}`;
   <meta name="author" content="Dr. Sanjeeva Reddy Dodlapati">
   <meta name="keywords" content="AI, Machine Learning, Genomics, Computational Biology, Data Science, Bioinformatics, Research, Academic">
   <meta name="generator" content={Astro.generator}>
-  {canonical && <link rel="canonical" href={fullUrl}>}
-  {noindex && <meta name="robots" content="noindex, nofollow">}
+  {canonicalURL && <link rel="canonical" href={fullUrl}>}
   
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content={fullUrl}>
   <meta property="og:title" content={`${title} | Dr. Sanjeeva Dodlapati`}>
   <meta property="og:description" content={description}>
-  <meta property="og:image" content={ogImage}>
+  <meta property="og:image" content={fullOgImage}>
   <meta property="og:site_name" content="Dr. Sanjeeva Dodlapati - AI Research & Genomics">
   
   <!-- Twitter -->
@@ -50,7 +53,7 @@ const ogImage = `${siteUrl}${baseUrl}${image}`;
   <meta property="twitter:url" content={fullUrl}>
   <meta property="twitter:title" content={`${title} | Dr. Sanjeeva Dodlapati`}>
   <meta property="twitter:description" content={description}>
-  <meta property="twitter:image" content={ogImage}>
+  <meta property="twitter:image" content={fullOgImage}>
   <meta property="twitter:creator" content="@dodlapati_reddy">
   
   <!-- Favicons -->
@@ -139,5 +142,7 @@ const ogImage = `${siteUrl}${baseUrl}${image}`;
       </div>
     </div>
   </footer>
+  
+  {showPerformanceWidget && <PerformanceMonitor />}
 </body>
 </html>
