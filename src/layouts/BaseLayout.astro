@@ -16,40 +16,43 @@ const baseUrl = import.meta.env.BASE_URL;
   <title>{title} | Dr. Sanjeeva Dodlapati</title>
   <meta name="description" content={description}>
   <meta name="generator" content={Astro.generator}>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 </head>
-<body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-  <nav class="bg-white shadow-sm border-b">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between h-16">
+<body class="min-h-screen bg-white text-gray-900 font-inter antialiased leading-relaxed">
+  <nav class="bg-white border-b border-gray-200">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="flex justify-between items-center h-16">
         <div class="flex items-center">
-          <a href={`${baseUrl}/`} class="text-xl font-bold text-gray-900 py-2 px-1">Dr. Sanjeeva Dodlapati</a>
+          <a href={`${baseUrl}/`} class="text-lg font-semibold text-gray-900 hover:text-gray-700 transition-colors">Dr. Sanjeeva Dodlapati</a>
         </div>
-        <div class="hidden md:flex items-center space-x-6">
-          <a href={`${baseUrl}/`} class="text-gray-700 hover:text-blue-600 transition-colors py-2 px-3 rounded-md text-sm font-medium">Home</a>
-          <a href={`${baseUrl}/research`} class="text-gray-700 hover:text-blue-600 transition-colors py-2 px-3 rounded-md text-sm font-medium">Research</a>
-          <a href={`${baseUrl}/experience`} class="text-gray-700 hover:text-blue-600 transition-colors py-2 px-3 rounded-md text-sm font-medium">Experience</a>
-          <a href={`${baseUrl}/blog`} class="text-gray-700 hover:text-blue-600 transition-colors py-2 px-3 rounded-md text-sm font-medium">Blog</a>
-          <a href={`${baseUrl}/contact`} class="text-gray-700 hover:text-blue-600 transition-colors py-2 px-3 rounded-md text-sm font-medium">Contact</a>
+        <div class="hidden md:flex items-center space-x-8">
+          <a href={`${baseUrl}/`} class="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium">Home</a>
+          <a href={`${baseUrl}/research`} class="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium">Research</a>
+          <a href={`${baseUrl}/experience`} class="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium">Experience</a>
+          <a href={`${baseUrl}/blog`} class="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium">Blog</a>
+          <a href={`${baseUrl}/contact`} class="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium">Contact</a>
         </div>
         <!-- Mobile menu -->
-        <div class="md:hidden flex items-center space-x-4">
-          <a href={`${baseUrl}/blog`} class="text-gray-700 hover:text-blue-600 transition-colors py-2 px-2 text-sm">Blog</a>
-          <a href={`${baseUrl}/contact`} class="text-gray-700 hover:text-blue-600 transition-colors py-2 px-2 text-sm">Contact</a>
+        <div class="md:hidden flex items-center space-x-6">
+          <a href={`${baseUrl}/blog`} class="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium">Blog</a>
+          <a href={`${baseUrl}/contact`} class="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium">Contact</a>
         </div>
       </div>
     </div>
   </nav>
   
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <main class="max-w-4xl mx-auto px-6 py-8">
     <slot />
   </main>
   
-  <footer class="bg-gray-800 text-white py-12 mt-16">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center">
+  <footer class="border-t border-gray-200 mt-16 py-8">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-center text-sm text-gray-500">
         <p>&copy; 2025 Dr. Sanjeeva Dodlapati. All rights reserved.</p>
-        <p class="mt-2 text-gray-400">AI Research • Bioinformatics • Computational Biology</p>
+        <p class="mt-1">AI Research • Bioinformatics • Computational Biology</p>
       </div>
     </div>
   </footer>
