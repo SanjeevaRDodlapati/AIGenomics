@@ -1,0 +1,389 @@
+---
+// Simple Analytics Dashboard Component - Phase 3 Advanced Analytics
+// Tracks user engagement and provides insights
+---
+
+<div class="analytics-dashboard bg-white border border-gray-200 rounded-lg p-6 mb-6">
+  <div class="flex items-center justify-between mb-6">
+    <h3 class="text-xl font-semibold text-gray-900">Site Analytics</h3>
+    <div class="flex space-x-2">
+      <button 
+        id="refresh-analytics"
+        class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+      >
+        Refresh
+      </button>
+      <button 
+        id="export-analytics"
+        class="px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 transition-colors"
+      >
+        Export
+      </button>
+    </div>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-lg">
+      <div class="text-sm opacity-90">Page Views</div>
+      <div id="page-views" class="text-2xl font-bold">-</div>
+      <div id="page-views-change" class="text-sm opacity-90">-</div>
+    </div>
+    
+    <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-lg">
+      <div class="text-sm opacity-90">Unique Visitors</div>
+      <div id="unique-visitors" class="text-2xl font-bold">-</div>
+      <div id="visitors-change" class="text-sm opacity-90">-</div>
+    </div>
+    
+    <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-4 rounded-lg">
+      <div class="text-sm opacity-90">Newsletter Signups</div>
+      <div id="newsletter-signups" class="text-2xl font-bold">-</div>
+      <div id="signups-change" class="text-sm opacity-90">-</div>
+    </div>
+    
+    <div class="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-4 rounded-lg">
+      <div class="text-sm opacity-90">Avg. Session Time</div>
+      <div id="avg-session" class="text-2xl font-bold">-</div>
+      <div id="session-change" class="text-sm opacity-90">-</div>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Page Views Over Time -->
+    <div class="bg-gray-50 p-4 rounded-lg">
+      <h4 class="text-lg font-medium text-gray-900 mb-3">Page Views (Last 7 Days)</h4>
+      <div class="relative h-48">
+        <canvas id="page-views-chart" class="w-full h-full"></canvas>
+      </div>
+    </div>
+
+    <!-- Top Pages -->
+    <div class="bg-gray-50 p-4 rounded-lg">
+      <h4 class="text-lg font-medium text-gray-900 mb-3">Popular Pages</h4>
+      <div id="popular-pages" class="space-y-2">
+        <!-- Dynamic content -->
+      </div>
+    </div>
+  </div>
+
+  <!-- User Engagement Metrics -->
+  <div class="mt-6 pt-6 border-t border-gray-200">
+    <h4 class="text-lg font-medium text-gray-900 mb-4">User Engagement</h4>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-gray-50 p-4 rounded-lg">
+        <div class="text-sm text-gray-600 mb-1">Bounce Rate</div>
+        <div id="bounce-rate" class="text-xl font-bold text-gray-900">-</div>
+        <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+          <div id="bounce-rate-bar" class="bg-red-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+      </div>
+      
+      <div class="bg-gray-50 p-4 rounded-lg">
+        <div class="text-sm text-gray-600 mb-1">Return Visitors</div>
+        <div id="return-visitors" class="text-xl font-bold text-gray-900">-</div>
+        <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+          <div id="return-visitors-bar" class="bg-green-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+      </div>
+      
+      <div class="bg-gray-50 p-4 rounded-lg">
+        <div class="text-sm text-gray-600 mb-1">Mobile Users</div>
+        <div id="mobile-users" class="text-xl font-bold text-gray-900">-</div>
+        <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+          <div id="mobile-users-bar" class="bg-blue-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Simple Analytics Dashboard - Phase 3 Implementation
+  class AnalyticsDashboard {
+    constructor() {
+      this.refreshBtn = document.getElementById('refresh-analytics');
+      this.exportBtn = document.getElementById('export-analytics');
+      
+      this.setupEventListeners();
+      this.loadAnalytics();
+      this.startPeriodicUpdates();
+    }
+    
+    setupEventListeners() {
+      this.refreshBtn?.addEventListener('click', () => this.loadAnalytics());
+      this.exportBtn?.addEventListener('click', () => this.exportData());
+    }
+    
+    async loadAnalytics() {
+      try {
+        // Show loading state
+        this.showLoadingState();
+        
+        // Simulate API call (replace with actual analytics service)
+        const data = await this.fetchAnalyticsData();
+        
+        // Update UI with data
+        this.updateQuickStats(data.stats);
+        this.updateEngagementMetrics(data.engagement);
+        this.updatePopularPages(data.pages);
+        this.updateChart(data.pageViews);
+        
+      } catch (error) {
+        console.error('Failed to load analytics:', error);
+        this.showError();
+      }
+    }
+    
+    async fetchAnalyticsData() {
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Generate mock data (replace with actual analytics API)
+      const now = new Date();
+      const pageViews = [];
+      
+      // Generate last 7 days of data
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date(now);
+        date.setDate(date.getDate() - i);
+        pageViews.push({
+          date: date.toISOString().split('T')[0],
+          views: Math.floor(Math.random() * 500) + 100
+        });
+      }
+      
+      // Get data from localStorage for demonstration
+      const visitors = this.getStoredData('analytics_visitors', 0);
+      const signups = JSON.parse(localStorage.getItem('analytics_subscriptions') || '[]').length;
+      
+      return {
+        stats: {
+          pageViews: pageViews.reduce((sum, day) => sum + day.views, 0),
+          uniqueVisitors: visitors,
+          newsletterSignups: signups,
+          avgSessionTime: Math.floor(Math.random() * 300) + 60 // seconds
+        },
+        engagement: {
+          bounceRate: Math.floor(Math.random() * 30) + 20,
+          returnVisitors: Math.floor(Math.random() * 40) + 20,
+          mobileUsers: Math.floor(Math.random() * 50) + 30
+        },
+        pages: [
+          { path: '/blog', views: Math.floor(Math.random() * 200) + 100, title: 'Blog' },
+          { path: '/research', views: Math.floor(Math.random() * 150) + 75, title: 'Research' },
+          { path: '/', views: Math.floor(Math.random() * 300) + 150, title: 'Home' },
+          { path: '/experience', views: Math.floor(Math.random() * 100) + 50, title: 'Experience' },
+          { path: '/contact', views: Math.floor(Math.random() * 80) + 40, title: 'Contact' }
+        ].sort((a, b) => b.views - a.views),
+        pageViews: pageViews
+      };
+    }
+    
+    updateQuickStats(stats) {
+      document.getElementById('page-views').textContent = stats.pageViews.toLocaleString();
+      document.getElementById('unique-visitors').textContent = stats.uniqueVisitors.toLocaleString();
+      document.getElementById('newsletter-signups').textContent = stats.newsletterSignups.toLocaleString();
+      
+      // Format session time
+      const minutes = Math.floor(stats.avgSessionTime / 60);
+      const seconds = stats.avgSessionTime % 60;
+      document.getElementById('avg-session').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      
+      // Add change indicators (mock data)
+      document.getElementById('page-views-change').textContent = '+12% from last week';
+      document.getElementById('visitors-change').textContent = '+8% from last week';
+      document.getElementById('signups-change').textContent = `+${stats.newsletterSignups > 0 ? stats.newsletterSignups : 'New!'} this week`;
+      document.getElementById('session-change').textContent = '+5% from last week';
+    }
+    
+    updateEngagementMetrics(engagement) {
+      // Update bounce rate
+      document.getElementById('bounce-rate').textContent = `${engagement.bounceRate}%`;
+      document.getElementById('bounce-rate-bar').style.width = `${engagement.bounceRate}%`;
+      
+      // Update return visitors
+      document.getElementById('return-visitors').textContent = `${engagement.returnVisitors}%`;
+      document.getElementById('return-visitors-bar').style.width = `${engagement.returnVisitors}%`;
+      
+      // Update mobile users
+      document.getElementById('mobile-users').textContent = `${engagement.mobileUsers}%`;
+      document.getElementById('mobile-users-bar').style.width = `${engagement.mobileUsers}%`;
+    }
+    
+    updatePopularPages(pages) {
+      const container = document.getElementById('popular-pages');
+      container.innerHTML = pages.map((page, index) => `
+        <div class="flex items-center justify-between p-2 bg-white rounded border">
+          <div class="flex items-center space-x-2">
+            <span class="w-6 h-6 bg-blue-100 text-blue-600 text-xs font-bold rounded-full flex items-center justify-center">
+              ${index + 1}
+            </span>
+            <span class="font-medium">${page.title}</span>
+            <span class="text-sm text-gray-500">${page.path}</span>
+          </div>
+          <div class="text-sm font-medium text-gray-900">
+            ${page.views.toLocaleString()} views
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    async updateChart(pageViewsData) {
+      // Load Chart.js if not available
+      if (typeof Chart === 'undefined') {
+        await this.loadChartJS();
+      }
+      
+      const canvas = document.getElementById('page-views-chart');
+      const ctx = canvas.getContext('2d');
+      
+      // Destroy existing chart
+      if (this.pageViewsChart) {
+        this.pageViewsChart.destroy();
+      }
+      
+      this.pageViewsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: pageViewsData.map(d => {
+            const date = new Date(d.date);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          }),
+          datasets: [{
+            label: 'Page Views',
+            data: pageViewsData.map(d => d.views),
+            borderColor: 'rgb(59, 130, 246)',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(0, 0, 0, 0.1)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    async loadChartJS() {
+      return new Promise((resolve, reject) => {
+        if (document.querySelector('script[src*="chart.js"]')) {
+          resolve();
+          return;
+        }
+        
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js';
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    }
+    
+    exportData() {
+      // Create exportable data
+      const exportData = {
+        timestamp: new Date().toISOString(),
+        pageViews: document.getElementById('page-views').textContent,
+        uniqueVisitors: document.getElementById('unique-visitors').textContent,
+        newsletterSignups: document.getElementById('newsletter-signups').textContent,
+        avgSessionTime: document.getElementById('avg-session').textContent,
+        bounceRate: document.getElementById('bounce-rate').textContent,
+        returnVisitors: document.getElementById('return-visitors').textContent,
+        mobileUsers: document.getElementById('mobile-users').textContent
+      };
+      
+      // Create and download CSV
+      const csv = Object.entries(exportData)
+        .map(([key, value]) => `${key},${value}`)
+        .join('\n');
+      
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `analytics-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+      
+      // Track export event
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'analytics_export', {
+          'event_category': 'engagement',
+          'value': 1
+        });
+      }
+    }
+    
+    showLoadingState() {
+      const elements = [
+        'page-views', 'unique-visitors', 'newsletter-signups', 'avg-session',
+        'bounce-rate', 'return-visitors', 'mobile-users'
+      ];
+      
+      elements.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = 'Loading...';
+      });
+    }
+    
+    showError() {
+      const elements = [
+        'page-views', 'unique-visitors', 'newsletter-signups', 'avg-session',
+        'bounce-rate', 'return-visitors', 'mobile-users'
+      ];
+      
+      elements.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = 'Error';
+      });
+    }
+    
+    getStoredData(key, defaultValue) {
+      try {
+        const value = localStorage.getItem(key);
+        return value ? parseInt(value) : defaultValue;
+      } catch {
+        return defaultValue;
+      }
+    }
+    
+    startPeriodicUpdates() {
+      // Update analytics every 5 minutes
+      setInterval(() => {
+        this.loadAnalytics();
+      }, 5 * 60 * 1000);
+    }
+  }
+  
+  // Initialize dashboard when DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    new AnalyticsDashboard();
+  });
+  
+  // Track page view
+  if (typeof localStorage !== 'undefined') {
+    const currentViews = parseInt(localStorage.getItem('analytics_visitors') || '0');
+    localStorage.setItem('analytics_visitors', (currentViews + 1).toString());
+  }
+</script>

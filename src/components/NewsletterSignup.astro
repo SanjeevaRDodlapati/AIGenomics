@@ -1,0 +1,300 @@
+---
+// Newsletter Signup Component - Phase 3 Interactive Features
+// Includes email validation, subscription management, and user engagement tracking
+interface Props {
+  title?: string;
+  description?: string;
+  placement?: 'sidebar' | 'footer' | 'inline';
+  theme?: 'light' | 'dark';
+}
+
+const { 
+  title = "Stay Updated", 
+  description = "Get notified about new research, articles, and insights in AI and computational biology.",
+  placement = 'inline',
+  theme = 'light'
+} = Astro.props;
+
+const themeClasses = theme === 'dark' 
+  ? {
+      container: 'bg-gray-800 border-gray-700',
+      title: 'text-white',
+      description: 'text-gray-300',
+      input: 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500',
+      button: 'bg-blue-600 hover:bg-blue-700 text-white',
+      success: 'bg-green-800 border-green-600 text-green-200',
+      error: 'bg-red-800 border-red-600 text-red-200'
+    }
+  : {
+      container: 'bg-white border-gray-200',
+      title: 'text-gray-900',
+      description: 'text-gray-600',
+      input: 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-blue-500 focus:border-blue-500',
+      button: 'bg-blue-600 hover:bg-blue-700 text-white',
+      success: 'bg-green-50 border-green-200 text-green-800',
+      error: 'bg-red-50 border-red-200 text-red-800'
+    };
+
+const sizeClasses = placement === 'sidebar' 
+  ? 'p-4' 
+  : placement === 'footer' 
+    ? 'p-6' 
+    : 'p-6';
+---
+
+<div class={`newsletter-signup border rounded-lg ${themeClasses.container} ${sizeClasses}`}>
+  <div class="mb-4">
+    <h3 class={`text-lg font-semibold ${themeClasses.title} mb-2`}>{title}</h3>
+    <p class={`text-sm ${themeClasses.description}`}>{description}</p>
+  </div>
+
+  <form class="newsletter-form" data-theme={theme}>
+    <div class="flex flex-col sm:flex-row gap-3">
+      <div class="flex-1">
+        <label for={`newsletter-email-${placement}`} class="sr-only">Email address</label>
+        <input
+          type="email"
+          id={`newsletter-email-${placement}`}
+          name="email"
+          required
+          class={`w-full px-4 py-3 rounded-lg transition-colors ${themeClasses.input}`}
+          placeholder="Enter your email address"
+        />
+        <div class="error-message hidden mt-1 text-sm text-red-500"></div>
+      </div>
+      
+      <button
+        type="submit"
+        class={`px-6 py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 ${themeClasses.button}`}
+        style="min-width: 120px;"
+      >
+        <span class="button-text">Subscribe</span>
+        <svg class="button-icon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Success Message -->
+    <div class={`success-message hidden mt-4 p-3 border rounded-lg ${themeClasses.success}`}>
+      <div class="flex items-start">
+        <div class="flex-shrink-0 pt-0.5">
+          <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div class="ml-2">
+          <p class="text-sm font-medium">Successfully subscribed!</p>
+          <p class="text-xs mt-1">You'll receive a confirmation email shortly.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div class={`error-message-container hidden mt-4 p-3 border rounded-lg ${themeClasses.error}`}>
+      <div class="flex items-start">
+        <div class="flex-shrink-0 pt-0.5">
+          <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div class="ml-2">
+          <p class="text-sm font-medium">Subscription failed</p>
+          <p class="text-xs mt-1 error-text">Please try again or check your email address.</p>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Privacy Notice -->
+  <div class="mt-4 text-xs text-gray-500">
+    <p>
+      By subscribing, you agree to receive periodic updates about research and insights. 
+      You can unsubscribe at any time. Read our 
+      <a href="/privacy" class="underline hover:text-gray-700">privacy policy</a>.
+    </p>
+  </div>
+</div>
+
+<script>
+  // Newsletter Subscription Handler - Phase 3 Interactive Features
+  class NewsletterSignup {
+    constructor(form) {
+      this.form = form;
+      this.emailInput = form.querySelector('input[name="email"]');
+      this.submitButton = form.querySelector('button[type="submit"]');
+      this.buttonText = form.querySelector('.button-text');
+      this.buttonIcon = form.querySelector('.button-icon');
+      this.successMessage = form.querySelector('.success-message');
+      this.errorMessageContainer = form.querySelector('.error-message-container');
+      this.errorMessage = form.querySelector('.error-message');
+      this.errorText = form.querySelector('.error-text');
+      this.theme = form.dataset.theme || 'light';
+      
+      this.emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      
+      this.setupEventListeners();
+    }
+    
+    setupEventListeners() {
+      this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+      this.emailInput.addEventListener('input', () => this.clearErrors());
+      this.emailInput.addEventListener('blur', () => this.validateEmail());
+    }
+    
+    validateEmail() {
+      const email = this.emailInput.value.trim();
+      let isValid = true;
+      let errorMessage = '';
+      
+      if (!email) {
+        errorMessage = 'Email address is required';
+        isValid = false;
+      } else if (!this.emailPattern.test(email)) {
+        errorMessage = 'Please enter a valid email address';
+        isValid = false;
+      }
+      
+      if (!isValid) {
+        this.showFieldError(errorMessage);
+        this.emailInput.classList.add('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+        this.emailInput.classList.remove('border-gray-300', 'focus:ring-blue-500', 'focus:border-blue-500');
+      } else {
+        this.clearFieldError();
+      }
+      
+      return isValid;
+    }
+    
+    showFieldError(message) {
+      this.errorMessage.textContent = message;
+      this.errorMessage.classList.remove('hidden');
+    }
+    
+    clearFieldError() {
+      this.errorMessage.classList.add('hidden');
+      this.emailInput.classList.remove('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+      this.emailInput.classList.add('border-gray-300', 'focus:ring-blue-500', 'focus:border-blue-500');
+    }
+    
+    clearErrors() {
+      this.clearFieldError();
+      this.errorMessageContainer.classList.add('hidden');
+      this.successMessage.classList.add('hidden');
+    }
+    
+    async handleSubmit(e) {
+      e.preventDefault();
+      
+      // Clear previous messages
+      this.clearErrors();
+      
+      // Validate email
+      if (!this.validateEmail()) {
+        return;
+      }
+      
+      // Set loading state
+      this.setLoadingState(true);
+      
+      try {
+        const email = this.emailInput.value.trim();
+        
+        // Submit to newsletter service
+        const result = await this.submitSubscription(email);
+        
+        if (result.success) {
+          this.showSuccess();
+          this.form.reset();
+          
+          // Track subscription event
+          this.trackSubscription(email);
+        } else {
+          this.showError(result.error || 'Subscription failed. Please try again.');
+        }
+        
+      } catch (error) {
+        this.showError('Network error. Please check your connection and try again.');
+      } finally {
+        this.setLoadingState(false);
+      }
+    }
+    
+    async submitSubscription(email) {
+      // Simulate API call (replace with actual newsletter service)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // For demo purposes, simulate occasional failures
+      if (Math.random() < 0.1) {
+        throw new Error('Network error');
+      }
+      
+      // Check for already subscribed emails (demo)
+      const existingSubscribers = JSON.parse(localStorage.getItem('newsletter_subscribers') || '[]');
+      if (existingSubscribers.includes(email)) {
+        return { success: false, error: 'This email is already subscribed.' };
+      }
+      
+      // Add to local storage (demo)
+      existingSubscribers.push(email);
+      localStorage.setItem('newsletter_subscribers', JSON.stringify(existingSubscribers));
+      
+      return { success: true };
+    }
+    
+    setLoadingState(isLoading) {
+      this.submitButton.disabled = isLoading;
+      
+      if (isLoading) {
+        this.buttonText.textContent = 'Subscribing...';
+        this.buttonIcon.innerHTML = '<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>';
+      } else {
+        this.buttonText.textContent = 'Subscribe';
+        this.buttonIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>';
+      }
+    }
+    
+    showSuccess() {
+      this.successMessage.classList.remove('hidden');
+      this.errorMessageContainer.classList.add('hidden');
+    }
+    
+    showError(message) {
+      this.errorText.textContent = message;
+      this.errorMessageContainer.classList.remove('hidden');
+      this.successMessage.classList.add('hidden');
+    }
+    
+    trackSubscription(email) {
+      // Analytics tracking for newsletter subscriptions
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'newsletter_signup', {
+          'event_category': 'engagement',
+          'event_label': 'newsletter',
+          'value': 1
+        });
+      }
+      
+      // Local analytics tracking
+      const subscriptions = JSON.parse(localStorage.getItem('analytics_subscriptions') || '[]');
+      subscriptions.push({
+        email: email.split('@')[1], // Store domain only for privacy
+        timestamp: new Date().toISOString(),
+        source: window.location.pathname
+      });
+      localStorage.setItem('analytics_subscriptions', JSON.stringify(subscriptions));
+      
+      console.log('Newsletter subscription tracked:', {
+        domain: email.split('@')[1],
+        source: window.location.pathname,
+        timestamp: new Date().toISOString()
+      });
+    }
+  }
+  
+  // Initialize all newsletter forms when DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    const forms = document.querySelectorAll('.newsletter-form');
+    forms.forEach(form => new NewsletterSignup(form));
+  });
+</script>

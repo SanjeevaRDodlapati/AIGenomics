@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import NewsletterSignup from '../components/NewsletterSignup.astro';
 const baseUrl = import.meta.env.BASE_URL;
 ---
 
@@ -49,6 +50,16 @@ const baseUrl = import.meta.env.BASE_URL;
           Read Blog →
         </a>
       </div>
+    </div>
+    
+    <!-- Newsletter Signup Section -->
+    <div class="mt-16 max-w-2xl mx-auto">
+      <NewsletterSignup 
+        title="Get Research Updates"
+        description="Subscribe to receive updates about my latest research, publications, and insights in AI and computational biology."
+        placement="inline"
+        theme="light"
+      />
     </div>
   </div>
 </BaseLayout>

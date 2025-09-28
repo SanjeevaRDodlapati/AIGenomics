@@ -1,0 +1,281 @@
+---
+// Interactive Code Cell Component for executing Python code in browser
+// Part of Phase 3: Interactive Computing
+interface Props {
+  code?: string;
+  language?: string;
+  showOutput?: boolean;
+  allowEdit?: boolean;
+}
+
+const { 
+  code = '', 
+  language = 'python', 
+  showOutput = true, 
+  allowEdit = true 
+} = Astro.props;
+
+const cellId = `code-cell-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<div class="interactive-code-cell border border-gray-200 rounded-lg overflow-hidden mb-6">
+  <!-- Code Editor Section -->
+  <div class="bg-gray-50 border-b border-gray-200 px-4 py-2 flex items-center justify-between">
+    <div class="flex items-center space-x-2">
+      <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+      </svg>
+      <span class="text-sm font-medium text-gray-700">Interactive {language.charAt(0).toUpperCase() + language.slice(1)}</span>
+    </div>
+    <div class="flex items-center space-x-2">
+      <button 
+        id={`run-${cellId}`}
+        class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors flex items-center space-x-1"
+        title="Run code (Shift+Enter)"
+      >
+        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+        <span>Run</span>
+      </button>
+      <button 
+        id={`reset-${cellId}`}
+        class="px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 transition-colors"
+        title="Reset to original code"
+      >
+        Reset
+      </button>
+    </div>
+  </div>
+
+  <!-- Code Input Area -->
+  <div class="relative">
+    <textarea
+      id={`editor-${cellId}`}
+      class="w-full p-4 font-mono text-sm bg-white resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset min-h-32"
+      style="tab-size: 4;"
+      spellcheck="false"
+      readonly={!allowEdit}
+    >{code.trim()}</textarea>
+    
+    {!allowEdit && (
+      <div class="absolute top-2 right-2 bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">
+        Read-only
+      </div>
+    )}
+  </div>
+
+  <!-- Output Section -->
+  {showOutput && (
+    <div class="border-t border-gray-200">
+      <div class="bg-gray-800 text-gray-100 p-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-medium text-gray-300">Output:</span>
+          <button 
+            id={`clear-${cellId}`}
+            class="text-xs text-gray-400 hover:text-gray-200 transition-colors"
+          >
+            Clear
+          </button>
+        </div>
+        <pre id={`output-${cellId}`} class="text-sm whitespace-pre-wrap font-mono min-h-8 text-green-400"></pre>
+        <div id={`loading-${cellId}`} class="hidden">
+          <div class="flex items-center space-x-2 text-blue-400">
+            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-400"></div>
+            <span class="text-sm">Running...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+</div>
+
+<script define:vars={{ cellId, code, language, allowEdit }}>
+  // Client-side code execution using Pyodide
+  class InteractiveCodeCell {
+    constructor(cellId, initialCode, language, allowEdit) {
+      this.cellId = cellId;
+      this.initialCode = initialCode;
+      this.language = language;
+      this.allowEdit = allowEdit;
+      
+      this.editor = document.getElementById(`editor-${cellId}`);
+      this.output = document.getElementById(`output-${cellId}`);
+      this.loading = document.getElementById(`loading-${cellId}`);
+      this.runBtn = document.getElementById(`run-${cellId}`);
+      this.resetBtn = document.getElementById(`reset-${cellId}`);
+      this.clearBtn = document.getElementById(`clear-${cellId}`);
+      
+      this.setupEventListeners();
+      this.loadPyodide();
+    }
+    
+    setupEventListeners() {
+      // Run button
+      this.runBtn?.addEventListener('click', () => this.runCode());
+      
+      // Reset button
+      this.resetBtn?.addEventListener('click', () => this.resetCode());
+      
+      // Clear output button
+      this.clearBtn?.addEventListener('click', () => this.clearOutput());
+      
+      // Keyboard shortcuts
+      this.editor?.addEventListener('keydown', (e) => {
+        if (e.shiftKey && e.key === 'Enter') {
+          e.preventDefault();
+          this.runCode();
+        }
+        
+        // Tab indentation
+        if (e.key === 'Tab') {
+          e.preventDefault();
+          const start = this.editor.selectionStart;
+          const end = this.editor.selectionEnd;
+          this.editor.value = this.editor.value.substring(0, start) + '    ' + this.editor.value.substring(end);
+          this.editor.selectionStart = this.editor.selectionEnd = start + 4;
+        }
+      });
+    }
+    
+    async loadPyodide() {
+      try {
+        // Load Pyodide from CDN if not already loaded
+        if (typeof window.pyodide === 'undefined') {
+          const script = document.createElement('script');
+          script.src = 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js';
+          script.onload = async () => {
+            window.pyodide = await loadPyodide();
+            // Load common packages
+            await window.pyodide.loadPackage(['numpy', 'matplotlib']);
+            this.pyodideReady = true;
+            this.updateRunButton();
+          };
+          document.head.appendChild(script);
+        } else if (window.pyodide) {
+          this.pyodideReady = true;
+          this.updateRunButton();
+        }
+      } catch (error) {
+        console.error('Failed to load Pyodide:', error);
+        this.showOutput(`Error loading Python environment: ${error.message}`, 'error');
+      }
+    }
+    
+    updateRunButton() {
+      if (this.pyodideReady) {
+        this.runBtn.disabled = false;
+        this.runBtn.title = 'Run code (Shift+Enter)';
+      } else {
+        this.runBtn.disabled = true;
+        this.runBtn.title = 'Loading Python environment...';
+        this.runBtn.innerHTML = '<div class="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div> Loading';
+      }
+    }
+    
+    async runCode() {
+      if (!this.pyodideReady) {
+        this.showOutput('Python environment not ready yet. Please wait...', 'warning');
+        return;
+      }
+      
+      const code = this.editor.value.trim();
+      if (!code) {
+        this.showOutput('No code to execute.', 'warning');
+        return;
+      }
+      
+      this.showLoading(true);
+      this.clearOutput();
+      
+      try {
+        // Redirect stdout to capture print statements
+        window.pyodide.runPython(`
+          import sys
+          from io import StringIO
+          _stdout = StringIO()
+          sys.stdout = _stdout
+        `);
+        
+        // Execute user code
+        const result = window.pyodide.runPython(code);
+        
+        // Get captured output
+        const output = window.pyodide.runPython('_stdout.getvalue()');
+        
+        // Reset stdout
+        window.pyodide.runPython('sys.stdout = sys.__stdout__');
+        
+        let displayOutput = '';
+        if (output.trim()) {
+          displayOutput += output.trim();
+        }
+        
+        if (result !== undefined && result !== null) {
+          if (displayOutput) displayOutput += '\n';
+          displayOutput += `>>> ${result}`;
+        }
+        
+        this.showOutput(displayOutput || 'Code executed successfully (no output)', 'success');
+        
+      } catch (error) {
+        window.pyodide.runPython('sys.stdout = sys.__stdout__');
+        this.showOutput(`Error: ${error.message}`, 'error');
+      } finally {
+        this.showLoading(false);
+      }
+    }
+    
+    resetCode() {
+      if (this.allowEdit) {
+        this.editor.value = this.initialCode;
+        this.clearOutput();
+      }
+    }
+    
+    clearOutput() {
+      if (this.output) {
+        this.output.textContent = '';
+      }
+    }
+    
+    showOutput(text, type = 'info') {
+      if (this.output) {
+        this.output.textContent = text;
+        
+        // Style based on type
+        this.output.className = 'text-sm whitespace-pre-wrap font-mono min-h-8 ';
+        switch (type) {
+          case 'error':
+            this.output.className += 'text-red-400';
+            break;
+          case 'warning':
+            this.output.className += 'text-yellow-400';
+            break;
+          case 'success':
+            this.output.className += 'text-green-400';
+            break;
+          default:
+            this.output.className += 'text-green-400';
+        }
+      }
+    }
+    
+    showLoading(show) {
+      if (this.loading) {
+        this.loading.style.display = show ? 'block' : 'none';
+      }
+      if (this.runBtn) {
+        this.runBtn.disabled = show;
+        this.runBtn.innerHTML = show 
+          ? '<div class="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div> Running'
+          : '<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Run';
+      }
+    }
+  }
+  
+  // Initialize the code cell
+  document.addEventListener('DOMContentLoaded', () => {
+    new InteractiveCodeCell(cellId, code, language, allowEdit);
+  });
+</script>
