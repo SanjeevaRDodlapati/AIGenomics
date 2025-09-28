@@ -5,7 +5,8 @@ import tailwind from '@astrojs/tailwind';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://sanjeevardodlapati.github.io/AIGenomics',
+  site: 'https://sanjeevardodlapati.github.io',
+  base: '/AIGenomics',
   integrations: [
     mdx(),
     sitemap(),

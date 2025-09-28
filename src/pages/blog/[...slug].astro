@@ -1,6 +1,8 @@
 ---
-import { getCollection } from 'astro:content';
+import { type CollectionEntry, getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const baseUrl = import.meta.env.BASE_URL;
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
@@ -84,10 +86,10 @@ const formattedDate = new Date(post.data.pubDate).toLocaleDateString('en-US', {
             focusing on the practical application of machine learning technologies in real-world scenarios.
           </p>
           <div class="flex space-x-4">
-            <a href="/experience" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+            <a href={`${baseUrl}/experience`} class="text-blue-600 hover:text-blue-700 text-sm font-medium">
               View Experience
             </a>
-            <a href="/research" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+            <a href={`${baseUrl}/research`} class="text-blue-600 hover:text-blue-700 text-sm font-medium">
               Research Profile
             </a>
           </div>
@@ -102,13 +104,13 @@ const formattedDate = new Date(post.data.pubDate).toLocaleDateString('en-US', {
           </p>
           <div class="flex flex-col sm:flex-row gap-3">
             <a 
-              href="/contact" 
+              href={`${baseUrl}/contact`} 
               class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-center"
             >
               Subscribe
             </a>
             <a 
-              href="/blog" 
+              href={`${baseUrl}/blog`} 
               class="border border-blue-600 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors text-center"
             >
               More Posts

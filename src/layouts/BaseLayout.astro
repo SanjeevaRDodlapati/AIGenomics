@@ -4,7 +4,8 @@ export interface Props {
   description?: string;
 }
 
-const { title, description = "Modern AI Research Portfolio and Blog" } = Astro.props;
+const { title, description = "Machine Learning and AI for Genomics, Computational Biology, and Drug Discovery" } = Astro.props;
+const baseUrl = import.meta.env.BASE_URL;
 ---
 
 <!DOCTYPE html>
@@ -22,14 +23,14 @@ const { title, description = "Modern AI Research Portfolio and Blog" } = Astro.p
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16">
         <div class="flex items-center">
-          <a href="/" class="text-xl font-bold text-gray-900">Dr. Sanjeeva Dodlapati</a>
+          <a href={`${baseUrl}/`} class="text-xl font-bold text-gray-900">Dr. Sanjeeva Dodlapati</a>
         </div>
         <div class="flex items-center space-x-8">
-          <a href="/" class="text-gray-700 hover:text-blue-600 transition-colors">Home</a>
-          <a href="/research" class="text-gray-700 hover:text-blue-600 transition-colors">Research</a>
-          <a href="/experience" class="text-gray-700 hover:text-blue-600 transition-colors">Experience</a>
-          <a href="/blog" class="text-gray-700 hover:text-blue-600 transition-colors">Blog</a>
-          <a href="/contact" class="text-gray-700 hover:text-blue-600 transition-colors">Contact</a>
+          <a href={`${baseUrl}/`} class="text-gray-700 hover:text-blue-600 transition-colors">Home</a>
+          <a href={`${baseUrl}/research`} class="text-gray-700 hover:text-blue-600 transition-colors">Research</a>
+          <a href={`${baseUrl}/experience`} class="text-gray-700 hover:text-blue-600 transition-colors">Experience</a>
+          <a href={`${baseUrl}/blog`} class="text-gray-700 hover:text-blue-600 transition-colors">Blog</a>
+          <a href={`${baseUrl}/contact`} class="text-gray-700 hover:text-blue-600 transition-colors">Contact</a>
         </div>
       </div>
     </div>

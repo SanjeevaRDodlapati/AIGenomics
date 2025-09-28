@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+const baseUrl = import.meta.env.BASE_URL;
 ---
 
 <BaseLayout title="Home" description="AI Research Portfolio and Blog by Dr. Sanjeeva Dodlapati">
@@ -24,7 +25,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <p class="text-gray-600">
           Cutting-edge research in AI applications for biological data analysis and drug discovery.
         </p>
-        <a href="/research" class="mt-4 inline-block text-blue-600 hover:text-blue-800 font-medium">
+        <a href={`${baseUrl}/research`} class="mt-4 inline-block text-blue-600 hover:text-blue-800 font-medium">
           View Research →
         </a>
       </div>
@@ -34,7 +35,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <p class="text-gray-600">
           Academic and industry experience in computational biology and machine learning.
         </p>
-        <a href="/experience" class="mt-4 inline-block text-blue-600 hover:text-blue-800 font-medium">
+        <a href={`${baseUrl}/experience`} class="mt-4 inline-block text-blue-600 hover:text-blue-800 font-medium">
           View Experience →
         </a>
       </div>
@@ -44,7 +45,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <p class="text-gray-600">
           Technical tutorials, research insights, and thoughts on the future of AI in biology.
         </p>
-        <a href="/blog" class="mt-4 inline-block text-blue-600 hover:text-blue-800 font-medium">
+        <a href={`${baseUrl}/blog`} class="mt-4 inline-block text-blue-600 hover:text-blue-800 font-medium">
           Read Blog →
         </a>
       </div>
