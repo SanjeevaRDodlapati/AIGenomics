@@ -15,7 +15,6 @@ const baseUrl = import.meta.env.BASE_URL;
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{title} | Dr. Sanjeeva Dodlapati</title>
   <meta name="description" content={description}>
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <meta name="generator" content={Astro.generator}>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -23,14 +22,19 @@ const baseUrl = import.meta.env.BASE_URL;
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16">
         <div class="flex items-center">
-          <a href={`${baseUrl}/`} class="text-xl font-bold text-gray-900">Dr. Sanjeeva Dodlapati</a>
+          <a href={`${baseUrl}/`} class="text-xl font-bold text-gray-900 py-2 px-1">Dr. Sanjeeva Dodlapati</a>
         </div>
-        <div class="flex items-center space-x-8">
-          <a href={`${baseUrl}/`} class="text-gray-700 hover:text-blue-600 transition-colors">Home</a>
-          <a href={`${baseUrl}/research`} class="text-gray-700 hover:text-blue-600 transition-colors">Research</a>
-          <a href={`${baseUrl}/experience`} class="text-gray-700 hover:text-blue-600 transition-colors">Experience</a>
-          <a href={`${baseUrl}/blog`} class="text-gray-700 hover:text-blue-600 transition-colors">Blog</a>
-          <a href={`${baseUrl}/contact`} class="text-gray-700 hover:text-blue-600 transition-colors">Contact</a>
+        <div class="hidden md:flex items-center space-x-6">
+          <a href={`${baseUrl}/`} class="text-gray-700 hover:text-blue-600 transition-colors py-2 px-3 rounded-md text-sm font-medium">Home</a>
+          <a href={`${baseUrl}/research`} class="text-gray-700 hover:text-blue-600 transition-colors py-2 px-3 rounded-md text-sm font-medium">Research</a>
+          <a href={`${baseUrl}/experience`} class="text-gray-700 hover:text-blue-600 transition-colors py-2 px-3 rounded-md text-sm font-medium">Experience</a>
+          <a href={`${baseUrl}/blog`} class="text-gray-700 hover:text-blue-600 transition-colors py-2 px-3 rounded-md text-sm font-medium">Blog</a>
+          <a href={`${baseUrl}/contact`} class="text-gray-700 hover:text-blue-600 transition-colors py-2 px-3 rounded-md text-sm font-medium">Contact</a>
+        </div>
+        <!-- Mobile menu -->
+        <div class="md:hidden flex items-center space-x-4">
+          <a href={`${baseUrl}/blog`} class="text-gray-700 hover:text-blue-600 transition-colors py-2 px-2 text-sm">Blog</a>
+          <a href={`${baseUrl}/contact`} class="text-gray-700 hover:text-blue-600 transition-colors py-2 px-2 text-sm">Contact</a>
         </div>
       </div>
     </div>
