@@ -1,7 +1,7 @@
 {
-  "name": "ai4science",
+  "name": "aigenomics",
   "version": "1.0.0",
-  "description": "AI4Science - Modern portfolio and research platform for AI in Science, bioinformatics, and computational biology",
+  "description": "AIGenomics - Machine Learning and AI for Genomics, Computational Biology, and Drug Discovery",
   "main": "index.js",
   "directories": {
     "doc": "docs"
