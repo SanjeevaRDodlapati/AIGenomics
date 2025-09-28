@@ -1,0 +1,574 @@
+---
+// Reading Progress Component - Advanced UX for long-form academic content
+interface Props {
+  target?: string;
+  showPercentage?: boolean;
+  showTimeEstimate?: boolean;
+  className?: string;
+}
+
+const { 
+  target = '.prose', 
+  showPercentage = true, 
+  showTimeEstimate = true,
+  className = ''
+} = Astro.props;
+---
+
+<div class={`reading-progress-container ${className}`}>
+  <!-- Progress Bar -->
+  <div class="reading-progress-bar">
+    <div class="reading-progress-fill"></div>
+  </div>
+  
+  <!-- Progress Info Widget -->
+  <div class="reading-progress-widget" id="reading-progress-widget">
+    <div class="widget-content">
+      <div class="progress-circle">
+        <svg class="progress-ring" width="36" height="36">
+          <circle 
+            class="progress-ring-bg" 
+            stroke="currentColor" 
+            stroke-width="2" 
+            fill="transparent" 
+            r="16" 
+            cx="18" 
+            cy="18"
+          />
+          <circle 
+            class="progress-ring-fill" 
+            stroke="currentColor" 
+            stroke-width="2" 
+            fill="transparent" 
+            r="16" 
+            cx="18" 
+            cy="18"
+            stroke-dasharray="100.48"
+            stroke-dashoffset="100.48"
+          />
+        </svg>
+        <div class="progress-text">
+          {showPercentage && <span id="progress-percentage">0%</span>}
+        </div>
+      </div>
+      
+      {showTimeEstimate && (
+        <div class="time-estimate">
+          <span id="time-remaining">-- min</span>
+          <span class="time-label">left</span>
+        </div>
+      )}
+      
+      <div class="reading-actions">
+        <button class="action-btn" id="bookmark-btn" title="Bookmark current position">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+          </svg>
+        </button>
+        
+        <button class="action-btn" id="scroll-top-btn" title="Back to top">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+          </svg>
+        </button>
+        
+        <button class="action-btn" id="share-position-btn" title="Share current position">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .reading-progress-container {
+    position: relative;
+    z-index: 1000;
+  }
+  
+  .reading-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    transition: opacity 0.3s ease;
+  }
+  
+  .reading-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #1d4ed8, #7c3aed);
+    width: 0%;
+    transition: width 0.1s ease-out;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+  }
+  
+  .reading-progress-widget {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow: 
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      0 0 0 1px rgba(255, 255, 255, 0.5);
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 120px;
+  }
+  
+  .reading-progress-widget.visible {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  
+  .widget-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .progress-circle {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .progress-ring-bg {
+    color: rgba(0, 0, 0, 0.1);
+  }
+  
+  .progress-ring-fill {
+    color: #3b82f6;
+    transition: stroke-dashoffset 0.1s ease-out;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+  }
+  
+  .progress-text {
+    position: absolute;
+    font-size: 10px;
+    font-weight: 600;
+    color: #374151;
+    text-align: center;
+  }
+  
+  .time-estimate {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 11px;
+    color: #6b7280;
+    text-align: center;
+    min-height: 28px;
+  }
+  
+  #time-remaining {
+    font-weight: 600;
+    color: #374151;
+    font-size: 12px;
+  }
+  
+  .time-label {
+    font-size: 10px;
+    margin-top: -2px;
+  }
+  
+  .reading-actions {
+    display: flex;
+    gap: 4px;
+    margin-top: 4px;
+  }
+  
+  .action-btn {
+    background: rgba(59, 130, 246, 0.1);
+    border: none;
+    border-radius: 6px;
+    padding: 6px;
+    color: #3b82f6;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .action-btn:hover {
+    background: rgba(59, 130, 246, 0.2);
+    transform: scale(1.05);
+  }
+  
+  .action-btn:active {
+    transform: scale(0.95);
+  }
+  
+  .action-btn.bookmarked {
+    background: #3b82f6;
+    color: white;
+  }
+  
+  /* Mobile adjustments */
+  @media (max-width: 768px) {
+    .reading-progress-widget {
+      bottom: 16px;
+      right: 16px;
+      padding: 10px;
+      min-width: 100px;
+    }
+    
+    .widget-content {
+      gap: 6px;
+    }
+    
+    .progress-ring {
+      width: 32px;
+      height: 32px;
+    }
+    
+    .progress-ring circle {
+      r: 14;
+      cx: 16;
+      cy: 16;
+    }
+    
+    .time-estimate {
+      min-height: 24px;
+    }
+    
+    #time-remaining {
+      font-size: 11px;
+    }
+    
+    .time-label {
+      font-size: 9px;
+    }
+  }
+  
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .reading-progress-bar {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .reading-progress-widget {
+      background: rgba(17, 24, 39, 0.95);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .progress-text,
+    #time-remaining {
+      color: #f3f4f6;
+    }
+    
+    .time-label {
+      color: #9ca3af;
+    }
+    
+    .progress-ring-bg {
+      color: rgba(255, 255, 255, 0.2);
+    }
+  }
+</style>
+
+<script>
+class ReadingProgress {
+  constructor() {
+    this.targetSelector = '.prose';
+    this.progressBar = null;
+    this.progressFill = null;
+    this.progressWidget = null;
+    this.progressRing = null;
+    this.progressText = null;
+    this.timeRemaining = null;
+    this.bookmarkBtn = null;
+    this.scrollTopBtn = null;
+    this.sharePositionBtn = null;
+    
+    this.isVisible = false;
+    this.bookmark = null;
+    this.wordsPerMinute = 200; // Average reading speed
+    this.totalWords = 0;
+    
+    this.init();
+  }
+  
+  init() {
+    // Wait for DOM to be ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => this.setup());
+    } else {
+      this.setup();
+    }
+  }
+  
+  setup() {
+    this.getElements();
+    this.calculateTotalWords();
+    this.bindEvents();
+    this.loadBookmark();
+    this.handleScroll(); // Initial calculation
+  }
+  
+  getElements() {
+    this.progressBar = document.querySelector('.reading-progress-bar');
+    this.progressFill = document.querySelector('.reading-progress-fill');
+    this.progressWidget = document.querySelector('.reading-progress-widget');
+    this.progressRing = document.querySelector('.progress-ring-fill');
+    this.progressText = document.querySelector('#progress-percentage');
+    this.timeRemaining = document.querySelector('#time-remaining');
+    this.bookmarkBtn = document.querySelector('#bookmark-btn');
+    this.scrollTopBtn = document.querySelector('#scroll-top-btn');
+    this.sharePositionBtn = document.querySelector('#share-position-btn');
+  }
+  
+  calculateTotalWords() {
+    const content = document.querySelector(this.targetSelector);
+    if (content) {
+      const text = content.innerText || content.textContent;
+      this.totalWords = text.trim().split(/\s+/).length;
+    }
+  }
+  
+  bindEvents() {
+    window.addEventListener('scroll', () => this.handleScroll());
+    
+    if (this.bookmarkBtn) {
+      this.bookmarkBtn.addEventListener('click', () => this.toggleBookmark());
+    }
+    
+    if (this.scrollTopBtn) {
+      this.scrollTopBtn.addEventListener('click', () => this.scrollToTop());
+    }
+    
+    if (this.sharePositionBtn) {
+      this.sharePositionBtn.addEventListener('click', () => this.sharePosition());
+    }
+  }
+  
+  handleScroll() {
+    const content = document.querySelector(this.targetSelector);
+    if (!content) return;
+    
+    const contentRect = content.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+    const contentHeight = content.offsetHeight;
+    
+    // Calculate reading progress
+    let progress = 0;
+    if (contentRect.top < 0) {
+      progress = Math.min(
+        (-contentRect.top) / (contentHeight - windowHeight + contentRect.top),
+        1
+      );
+    }
+    
+    // Update progress elements
+    this.updateProgress(progress);
+    
+    // Show/hide widget based on scroll position
+    const shouldShow = window.scrollY > 300 && progress < 0.98;
+    this.toggleWidget(shouldShow);
+  }
+  
+  updateProgress(progress) {
+    const percentage = Math.round(progress * 100);
+    
+    // Update progress bar
+    if (this.progressFill) {
+      this.progressFill.style.width = `${percentage}%`;
+    }
+    
+    // Update progress ring
+    if (this.progressRing) {
+      const circumference = 2 * Math.PI * 16; // r=16
+      const offset = circumference - (progress * circumference);
+      this.progressRing.style.strokeDashoffset = offset;
+    }
+    
+    // Update progress text
+    if (this.progressText) {
+      this.progressText.textContent = `${percentage}%`;
+    }
+    
+    // Update time estimate
+    if (this.timeRemaining && this.totalWords > 0) {
+      const wordsRead = Math.floor(this.totalWords * progress);
+      const wordsLeft = this.totalWords - wordsRead;
+      const minutesLeft = Math.ceil(wordsLeft / this.wordsPerMinute);
+      
+      if (minutesLeft > 60) {
+        const hours = Math.floor(minutesLeft / 60);
+        const mins = minutesLeft % 60;
+        this.timeRemaining.textContent = `${hours}h ${mins}m`;
+      } else if (minutesLeft > 0) {
+        this.timeRemaining.textContent = `${minutesLeft} min`;
+      } else {
+        this.timeRemaining.textContent = 'Complete!';
+      }
+    }
+  }
+  
+  toggleWidget(show) {
+    if (show && !this.isVisible) {
+      this.progressWidget?.classList.add('visible');
+      this.isVisible = true;
+    } else if (!show && this.isVisible) {
+      this.progressWidget?.classList.remove('visible');
+      this.isVisible = false;
+    }
+  }
+  
+  toggleBookmark() {
+    const currentPosition = window.scrollY;
+    
+    if (this.bookmark === currentPosition) {
+      // Remove bookmark
+      this.bookmark = null;
+      this.bookmarkBtn?.classList.remove('bookmarked');
+      localStorage.removeItem('reading-bookmark-' + window.location.pathname);
+    } else {
+      // Set bookmark
+      this.bookmark = currentPosition;
+      this.bookmarkBtn?.classList.add('bookmarked');
+      localStorage.setItem('reading-bookmark-' + window.location.pathname, currentPosition.toString());
+      
+      // Show feedback
+      this.showNotification('Position bookmarked!');
+    }
+  }
+  
+  loadBookmark() {
+    const saved = localStorage.getItem('reading-bookmark-' + window.location.pathname);
+    if (saved) {
+      this.bookmark = parseInt(saved);
+      this.bookmarkBtn?.classList.add('bookmarked');
+      
+      // Offer to resume reading
+      if (this.bookmark > 300) {
+        this.showResumeNotification();
+      }
+    }
+  }
+  
+  scrollToTop() {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
+  
+  sharePosition() {
+    const currentProgress = Math.round((window.scrollY / document.documentElement.scrollHeight) * 100);
+    const url = `${window.location.href}#progress-${currentProgress}`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: document.title,
+        url: url
+      });
+    } else {
+      // Fallback to clipboard
+      navigator.clipboard.writeText(url).then(() => {
+        this.showNotification('Position link copied to clipboard!');
+      });
+    }
+  }
+  
+  showNotification(message) {
+    // Create temporary notification
+    const notification = document.createElement('div');
+    notification.className = 'reading-notification';
+    notification.textContent = message;
+    notification.style.cssText = `
+      position: fixed;
+      bottom: 100px;
+      right: 24px;
+      background: #10b981;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 1001;
+      transform: translateY(20px);
+      opacity: 0;
+      transition: all 0.3s ease;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+      notification.style.transform = 'translateY(0)';
+      notification.style.opacity = '1';
+    }, 100);
+    
+    // Remove after delay
+    setTimeout(() => {
+      notification.style.transform = 'translateY(20px)';
+      notification.style.opacity = '0';
+      setTimeout(() => notification.remove(), 300);
+    }, 2000);
+  }
+  
+  showResumeNotification() {
+    const notification = document.createElement('div');
+    notification.className = 'resume-reading-notification';
+    notification.innerHTML = `
+      <div style="margin-bottom: 8px; font-weight: 500;">Continue reading from where you left off?</div>
+      <button id="resume-reading" style="background: #3b82f6; color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; margin-right: 8px;">Resume</button>
+      <button id="dismiss-resume" style="background: transparent; color: #6b7280; border: 1px solid #d1d5db; padding: 4px 12px; border-radius: 4px; cursor: pointer;">Dismiss</button>
+    `;
+    notification.style.cssText = `
+      position: fixed;
+      top: 80px;
+      right: 24px;
+      background: white;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 14px;
+      z-index: 1001;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      max-width: 300px;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Bind events
+    notification.querySelector('#resume-reading')?.addEventListener('click', () => {
+      window.scrollTo({
+        top: this.bookmark,
+        behavior: 'smooth'
+      });
+      notification.remove();
+    });
+    
+    notification.querySelector('#dismiss-resume')?.addEventListener('click', () => {
+      notification.remove();
+    });
+    
+    // Auto-remove after 10 seconds
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.remove();
+      }
+    }, 10000);
+  }
+}
+
+// Initialize reading progress
+new ReadingProgress();
+</script>

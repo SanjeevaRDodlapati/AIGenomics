@@ -1,0 +1,487 @@
+---
+// Content Series Manager - Handle multi-part academic content
+import { getCollection } from 'astro:content';
+
+interface Props {
+  currentPost: {
+    slug: string;
+    data: {
+      title: string;
+      series?: string;
+      seriesOrder?: number;
+      publishedAt?: Date;
+    };
+  };
+}
+
+const { currentPost } = Astro.props;
+
+let seriesPosts: any[] = [];
+let currentIndex = -1;
+let nextPost = null;
+let prevPost = null;
+
+if (currentPost.data.series) {
+  // Get all posts in the same series
+  const allPosts = await getCollection('blog');
+  seriesPosts = allPosts
+    .filter(post => 
+      post.data.series === currentPost.data.series && 
+      post.data.seriesOrder !== undefined
+    )
+    .sort((a, b) => (a.data.seriesOrder || 0) - (b.data.seriesOrder || 0));
+  
+  // Find current post index
+  currentIndex = seriesPosts.findIndex(post => post.slug === currentPost.slug);
+  
+  // Get previous and next posts
+  if (currentIndex > 0) {
+    prevPost = seriesPosts[currentIndex - 1];
+  }
+  if (currentIndex < seriesPosts.length - 1) {
+    nextPost = seriesPosts[currentIndex + 1];
+  }
+}
+
+function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  }).format(date);
+}
+
+function estimateReadingTime(content: string): number {
+  const wordsPerMinute = 200;
+  const wordCount = content.trim().split(/\s+/).length;
+  return Math.ceil(wordCount / wordsPerMinute);
+}
+---
+
+{currentPost.data.series && seriesPosts.length > 1 && (
+  <div class="content-series-manager">
+    <!-- Series Header -->
+    <div class="series-header">
+      <div class="series-info">
+        <div class="series-badge">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+          </svg>
+          <span>Series</span>
+        </div>
+        
+        <h3 class="series-title">{currentPost.data.series}</h3>
+        <p class="series-progress">
+          Part {currentIndex + 1} of {seriesPosts.length}
+        </p>
+      </div>
+      
+      <div class="series-progress-bar">
+        <div 
+          class="series-progress-fill" 
+          style={`width: ${((currentIndex + 1) / seriesPosts.length) * 100}%`}
+        ></div>
+      </div>
+    </div>
+    
+    <!-- Series Navigation -->
+    <div class="series-navigation">
+      {prevPost && (
+        <a href={`/blog/${prevPost.slug}/`} class="nav-card prev-post">
+          <div class="nav-direction">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            <span>Previous</span>
+          </div>
+          <h4 class="nav-title">{prevPost.data.title}</h4>
+          <p class="nav-meta">Part {prevPost.data.seriesOrder}</p>
+        </a>
+      )}
+      
+      {nextPost && (
+        <a href={`/blog/${nextPost.slug}/`} class="nav-card next-post">
+          <div class="nav-direction">
+            <span>Next</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </div>
+          <h4 class="nav-title">{nextPost.data.title}</h4>
+          <p class="nav-meta">Part {nextPost.data.seriesOrder}</p>
+        </a>
+      )}
+    </div>
+    
+    <!-- Series Overview (Collapsible) -->
+    <div class="series-overview">
+      <button class="series-toggle" onclick="toggleSeriesOverview()">
+        <span>View All Parts in This Series</span>
+        <svg class="toggle-icon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </button>
+      
+      <div class="series-list" id="series-list">
+        {seriesPosts.map((post, index) => (
+          <div class={`series-item ${post.slug === currentPost.slug ? 'current' : ''}`}>
+            <div class="item-number">{index + 1}</div>
+            <div class="item-content">
+              <h5 class="item-title">
+                {post.slug === currentPost.slug ? (
+                  <span class="current-indicator">
+                    {post.data.title}
+                    <span class="current-badge">Current</span>
+                  </span>
+                ) : (
+                  <a href={`/blog/${post.slug}/`}>{post.data.title}</a>
+                )}
+              </h5>
+              
+              {post.data.publishedAt && (
+                <p class="item-meta">
+                  {formatDate(new Date(post.data.publishedAt))}
+                </p>
+              )}
+            </div>
+            
+            <div class="item-status">
+              {post.slug === currentPost.slug ? (
+                <div class="status-current">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                </div>
+              ) : (
+                <div class="status-available">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                  </svg>
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+)}
+
+<style>
+  .content-series-manager {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 24px;
+    margin: 32px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .content-series-manager::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6, #1d4ed8, #7c3aed);
+  }
+  
+  .series-header {
+    margin-bottom: 24px;
+  }
+  
+  .series-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  
+  .series-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #dbeafe;
+    color: #1d4ed8;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    width: fit-content;
+  }
+  
+  .series-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+  }
+  
+  .series-progress {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+  }
+  
+  .series-progress-bar {
+    width: 100%;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  
+  .series-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+  
+  .series-navigation {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .nav-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .nav-card:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    transform: translateY(-2px);
+  }
+  
+  .nav-direction {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748b;
+  }
+  
+  .prev-post .nav-direction {
+    justify-content: flex-start;
+  }
+  
+  .next-post .nav-direction {
+    justify-content: flex-end;
+  }
+  
+  .next-post {
+    text-align: right;
+  }
+  
+  .nav-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    line-height: 1.4;
+  }
+  
+  .nav-meta {
+    font-size: 12px;
+    color: #94a3b8;
+    margin: 0;
+  }
+  
+  .series-overview {
+    border-top: 1px solid #e2e8f0;
+    padding-top: 24px;
+  }
+  
+  .series-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background: none;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    color: #3b82f6;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 16px;
+  }
+  
+  .toggle-icon {
+    transition: transform 0.2s ease;
+  }
+  
+  .series-toggle[aria-expanded="true"] .toggle-icon {
+    transform: rotate(180deg);
+  }
+  
+  .series-list {
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .series-list.visible {
+    display: flex;
+  }
+  
+  .series-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    transition: all 0.2s ease;
+  }
+  
+  .series-item:hover:not(.current) {
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .series-item.current {
+    background: #eff6ff;
+    border-color: #3b82f6;
+  }
+  
+  .item-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: #f1f5f9;
+    border-radius: 50%;
+    font-weight: 600;
+    font-size: 14px;
+    color: #64748b;
+    flex-shrink: 0;
+  }
+  
+  .current .item-number {
+    background: #3b82f6;
+    color: white;
+  }
+  
+  .item-content {
+    flex: 1;
+  }
+  
+  .item-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1e293b;
+    margin: 0 0 4px 0;
+    line-height: 1.4;
+  }
+  
+  .item-title a {
+    color: inherit;
+    text-decoration: none;
+  }
+  
+  .item-title a:hover {
+    color: #3b82f6;
+    text-decoration: underline;
+  }
+  
+  .current-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .current-badge {
+    background: #3b82f6;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  
+  .item-meta {
+    font-size: 12px;
+    color: #94a3b8;
+    margin: 0;
+  }
+  
+  .item-status {
+    flex-shrink: 0;
+  }
+  
+  .status-current {
+    color: #10b981;
+  }
+  
+  .status-available {
+    color: #64748b;
+  }
+  
+  /* Mobile responsive */
+  @media (max-width: 768px) {
+    .series-navigation {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    
+    .next-post {
+      text-align: left;
+    }
+    
+    .next-post .nav-direction {
+      justify-content: flex-start;
+      flex-direction: row-reverse;
+    }
+    
+    .content-series-manager {
+      padding: 20px;
+      margin: 24px 0;
+    }
+    
+    .series-title {
+      font-size: 18px;
+    }
+    
+    .nav-title {
+      font-size: 15px;
+    }
+  }
+</style>
+
+<script>
+function toggleSeriesOverview() {
+  const button = document.querySelector('.series-toggle');
+  const list = document.getElementById('series-list');
+  
+  if (!button || !list) return;
+  
+  const isExpanded = button.getAttribute('aria-expanded') === 'true';
+  
+  button.setAttribute('aria-expanded', (!isExpanded).toString());
+  list.classList.toggle('visible');
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+  const button = document.querySelector('.series-toggle');
+  if (button) {
+    button.setAttribute('aria-expanded', 'false');
+  }
+});
+</script>
