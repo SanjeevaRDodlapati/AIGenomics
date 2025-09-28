@@ -1,6 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import BlogSearch from '../components/BlogSearch.astro';
+import { calculateReadingTime, formatDate } from '../utils/blog.js';
 
 const posts = await getCollection('blog');
 const baseUrl = import.meta.env.BASE_URL;
@@ -11,10 +13,28 @@ const sortedPosts = posts.sort((a, b) => new Date(b.data.pubDate).valueOf() - ne
   <main class="max-w-4xl mx-auto px-4 py-8">
     <header class="mb-12">
       <h1 class="text-4xl font-bold text-gray-900 mb-4">Blog</h1>
-      <p class="text-xl text-gray-600 leading-relaxed">
+      <p class="text-xl text-gray-600 leading-relaxed mb-6">
         Insights, discoveries, and thoughts on AI, data science, and the intersection
         of technology with real-world applications. Updated weekly with new perspectives.
       </p>
+      
+      <!-- Search and RSS -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div class="flex-1 max-w-md">
+          <BlogSearch />
+        </div>
+        <div class="flex items-center space-x-4">
+          <a 
+            href={`${baseUrl}/rss.xml`}
+            class="inline-flex items-center text-sm text-gray-600 hover:text-blue-600 transition-colors"
+          >
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M6.503 20.752c0 1.794-1.456 3.248-3.251 3.248-1.796 0-3.252-1.454-3.252-3.248 0-1.794 1.456-3.248 3.252-3.248 1.795.001 3.251 1.454 3.251 3.248zm-6.503-12.572v4.811c6.05.062 10.96 4.966 11.022 11.009h4.817c-.062-8.71-7.118-15.758-15.839-15.82zm0-3.368c10.58.046 19.152 8.594 19.183 19.188h4.817c-.03-13.231-10.755-23.954-24-24v4.812z"/>
+            </svg>
+            RSS Feed
+          </a>
+        </div>
+      </div>
     </header>
 
     {sortedPosts.length === 0 ? (
@@ -36,11 +56,8 @@ const sortedPosts = posts.sort((a, b) => new Date(b.data.pubDate).valueOf() - ne
     ) : (
       <section class="space-y-8">
         {sortedPosts.map((post) => {
-          const formattedDate = new Date(post.data.pubDate).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          });
+          const formattedDate = formatDate(post.data.pubDate);
+          const readingTime = calculateReadingTime(post.body);
           
           return (
             <article class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
@@ -59,6 +76,8 @@ const sortedPosts = posts.sort((a, b) => new Date(b.data.pubDate).valueOf() - ne
                   </time>
                   <span>•</span>
                   <span>{post.data.author || 'Dr. Sanjeeva Reddy Dodlapati'}</span>
+                  <span>•</span>
+                  <span class="text-blue-600">{readingTime.readingTimeText}</span>
                   {post.data.tags && (
                     <>
                       <span>•</span>

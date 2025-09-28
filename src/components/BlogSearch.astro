@@ -1,0 +1,145 @@
+---
+// Blog search component
+---
+
+<div class="search-container">
+  <div class="relative">
+    <input 
+      type="text" 
+      id="search-input" 
+      placeholder="Search blog posts..." 
+      class="w-full px-4 py-3 pl-10 pr-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+    />
+    <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+    </svg>
+  </div>
+  <div id="search-results" class="mt-4 space-y-4 hidden"></div>
+</div>
+
+<script>
+  // Simple client-side search functionality
+  const searchInput = document.getElementById('search-input');
+  const searchResults = document.getElementById('search-results');
+  
+  // Mock data - in a real implementation, this would come from an API or be pre-built
+  const blogPosts = [
+    {
+      title: "Welcome to My Academic Portfolio",
+      description: "Introducing my new minimalist-first approach to academic blogging and research showcase",
+      url: "/AIGenomics/blog/welcome",
+      tags: ["announcement", "portfolio", "astro"],
+      content: "welcome academic portfolio minimalist approach blogging research showcase"
+    },
+    {
+      title: "BioNumPy for Bioinformatics: Efficient Sequence Analysis at Scale",
+      description: "A comprehensive guide to BioNumPy, exploring how this powerful package combines NumPy's efficiency with bioinformatics workflows for large-scale biological data analysis.",
+      url: "/AIGenomics/blog/bionumpy-bioinformatics-guide",
+      tags: ["BioNumPy", "Bioinformatics", "Python", "Sequence Analysis", "Computational Biology"],
+      content: "bionumpy bioinformatics sequence analysis numpy python computational biology genomics"
+    },
+    {
+      title: "AI Agents in Biomedical Research: Transforming Discovery",
+      description: "Exploring how AI agents are revolutionizing biomedical research through automated hypothesis generation, experimental design, and accelerated discovery pipelines.",
+      url: "/AIGenomics/blog/ai-agents-biomedical-research",
+      tags: ["AI Agents", "Biomedical Research", "Machine Learning", "Drug Discovery", "Automation"],
+      content: "ai agents biomedical research machine learning drug discovery automation hypothesis generation"
+    },
+    {
+      title: "Practical AI Applications in 2024: From Concept to Production",
+      description: "A comprehensive overview of practical AI applications that are making real-world impact in 2024, from healthcare to finance to scientific research.",
+      url: "/AIGenomics/blog/practical-ai-applications-2024",
+      tags: ["AI Applications", "Machine Learning", "Production AI", "Healthcare", "Finance"],
+      content: "practical ai applications machine learning production healthcare finance scientific research"
+    },
+    {
+      title: "Data Science Methodology: A Comprehensive Guide",
+      description: "Complete guide to data science methodology covering problem definition, data collection, analysis, modeling, and deployment strategies for successful projects.",
+      url: "/AIGenomics/blog/data-science-methodology-guide",
+      tags: ["Data Science", "Methodology", "Analytics", "Machine Learning", "Best Practices"],
+      content: "data science methodology guide analytics machine learning best practices problem definition modeling"
+    },
+    {
+      title: "The Future of Academic Research in the AI Era",
+      description: "Examining how artificial intelligence is reshaping academic research methodologies, collaboration patterns, and knowledge discovery processes across disciplines.",
+      url: "/AIGenomics/blog/future-of-academic-research",
+      tags: ["Academic Research", "AI", "Future of Science", "Research Methodology", "Interdisciplinary"],
+      content: "future academic research ai era artificial intelligence methodology collaboration knowledge discovery"
+    }
+  ];
+  
+  function performSearch(query) {
+    if (query.length < 2) {
+      searchResults.classList.add('hidden');
+      return;
+    }
+    
+    const results = blogPosts.filter(post => {
+      const searchText = `${post.title} ${post.description} ${post.content} ${post.tags.join(' ')}`.toLowerCase();
+      return searchText.includes(query.toLowerCase());
+    });
+    
+    displayResults(results, query);
+  }
+  
+  function displayResults(results, query) {
+    if (results.length === 0) {
+      searchResults.innerHTML = `
+        <div class="text-center py-8 text-gray-500">
+          <p>No results found for "${query}"</p>
+          <p class="text-sm mt-2">Try different keywords or browse all posts</p>
+        </div>
+      `;
+    } else {
+      searchResults.innerHTML = results.map(post => `
+        <article class="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
+          <h3 class="font-semibold text-gray-900 mb-2">
+            <a href="${post.url}" class="hover:text-blue-600 transition-colors">
+              ${highlightMatch(post.title, query)}
+            </a>
+          </h3>
+          <p class="text-gray-600 text-sm mb-2">
+            ${highlightMatch(post.description, query)}
+          </p>
+          <div class="flex flex-wrap gap-1">
+            ${post.tags.slice(0, 3).map(tag => 
+              `<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">${tag}</span>`
+            ).join('')}
+          </div>
+        </article>
+      `).join('');
+    }
+    
+    searchResults.classList.remove('hidden');
+  }
+  
+  function highlightMatch(text, query) {
+    const regex = new RegExp(`(${query})`, 'gi');
+    return text.replace(regex, '<mark class="bg-yellow-200 text-gray-900">$1</mark>');
+  }
+  
+  // Debounced search
+  let searchTimeout;
+  searchInput?.addEventListener('input', (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      performSearch(e.target.value);
+    }, 300);
+  });
+  
+  // Clear results when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-container')) {
+      searchResults?.classList.add('hidden');
+    }
+  });
+</script>
+
+<style>
+  mark {
+    background-color: #fef3c7;
+    color: #1f2937;
+    padding: 0 2px;
+    border-radius: 2px;
+  }
+</style>

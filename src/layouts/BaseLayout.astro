@@ -2,10 +2,23 @@
 export interface Props {
   title: string;
   description?: string;
+  image?: string;
+  canonical?: string;
+  noindex?: boolean;
 }
 
-const { title, description = "Machine Learning and AI for Genomics, Computational Biology, and Drug Discovery" } = Astro.props;
+const { 
+  title, 
+  description = "Machine Learning and AI for Genomics, Computational Biology, and Drug Discovery",
+  image = "/images/og-default.jpg",
+  canonical,
+  noindex = false
+} = Astro.props;
+
 const baseUrl = import.meta.env.BASE_URL;
+const siteUrl = "https://sanjeevardodlapati.github.io";
+const fullUrl = canonical || `${siteUrl}${baseUrl}${Astro.url.pathname}`;
+const ogImage = `${siteUrl}${baseUrl}${image}`;
 ---
 
 <!DOCTYPE html>
@@ -13,13 +26,83 @@ const baseUrl = import.meta.env.BASE_URL;
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Primary Meta Tags -->
   <title>{title} | Dr. Sanjeeva Dodlapati</title>
+  <meta name="title" content={`${title} | Dr. Sanjeeva Dodlapati`}>
   <meta name="description" content={description}>
+  <meta name="author" content="Dr. Sanjeeva Reddy Dodlapati">
+  <meta name="keywords" content="AI, Machine Learning, Genomics, Computational Biology, Data Science, Bioinformatics, Research, Academic">
   <meta name="generator" content={Astro.generator}>
+  {canonical && <link rel="canonical" href={fullUrl}>}
+  {noindex && <meta name="robots" content="noindex, nofollow">}
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content={fullUrl}>
+  <meta property="og:title" content={`${title} | Dr. Sanjeeva Dodlapati`}>
+  <meta property="og:description" content={description}>
+  <meta property="og:image" content={ogImage}>
+  <meta property="og:site_name" content="Dr. Sanjeeva Dodlapati - AI Research & Genomics">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content={fullUrl}>
+  <meta property="twitter:title" content={`${title} | Dr. Sanjeeva Dodlapati`}>
+  <meta property="twitter:description" content={description}>
+  <meta property="twitter:image" content={ogImage}>
+  <meta property="twitter:creator" content="@dodlapati_reddy">
+  
+  <!-- Favicons -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  
+  <!-- Preconnect to external resources -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://www.google-analytics.com">
+  
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Syntax highlighting -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  
+  <!-- KaTeX for mathematical formulas -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">
+  
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Dr. Sanjeeva Reddy Dodlapati",
+      "url": "https://sanjeevardodlapati.github.io/AIGenomics/",
+      "image": "https://sanjeevardodlapati.github.io/AIGenomics/images/profile.jpg",
+      "jobTitle": "AI Research Scientist",
+      "worksFor": {
+        "@type": "EducationalOrganization",
+        "name": "Old Dominion University"
+      },
+      "alumniOf": "Old Dominion University",
+      "knowsAbout": ["Artificial Intelligence", "Machine Learning", "Genomics", "Computational Biology", "Data Science", "Bioinformatics"],
+      "sameAs": [
+        "https://www.linkedin.com/in/sanjeeva-reddy-dodlapati-ab4ab490/",
+        "https://github.com/SanjeevaRDodlapati",
+        "https://scholar.google.com/citations?user=7FND004AAAAJ&hl=en&authuser=1",
+        "https://twitter.com/dodlapati_reddy"
+      ]
+    }
+  </script>
+  
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'GA_MEASUREMENT_ID');
+  </script>
 </head>
 <body class="min-h-screen bg-white text-gray-900 font-inter antialiased leading-relaxed">
   <nav class="bg-white border-b border-gray-200">
