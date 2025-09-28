@@ -1,8 +1,24 @@
 ---
 import { type CollectionEntry, getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { marked } from 'marked';
+import hljs from 'highlight.js';
 
 const baseUrl = import.meta.env.BASE_URL;
+
+// Configure marked with syntax highlighting
+marked.setOptions({
+  highlight: function(code, lang) {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        return hljs.highlight(code, { language: lang }).value;
+      } catch (err) {}
+    }
+    return hljs.highlightAuto(code).value;
+  },
+  breaks: true,
+  gfm: true,
+});
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
@@ -13,6 +29,7 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
+const renderedContent = marked(post.body);
 
 const formattedDate = new Date(post.data.pubDate).toLocaleDateString('en-US', {
   year: 'numeric',
@@ -68,11 +85,9 @@ const formattedDate = new Date(post.data.pubDate).toLocaleDateString('en-US', {
     </header>
 
     <!-- Article Content -->
-          <div class="bg-white rounded-lg border border-gray-200 p-6">
-        <div class="font-mono text-sm whitespace-pre-wrap leading-relaxed text-gray-800">
-          {post.body}
-        </div>
-      </div>
+    <article class="prose prose-lg max-w-none prose-headings:text-gray-900 prose-h1:text-3xl prose-h1:font-bold prose-h1:mb-6 prose-h1:mt-8 prose-h2:text-2xl prose-h2:font-semibold prose-h2:mb-4 prose-h2:mt-6 prose-h3:text-xl prose-h3:font-medium prose-h3:mb-3 prose-h3:mt-4 prose-p:mb-4 prose-p:leading-relaxed prose-a:text-blue-600 hover:prose-a:text-blue-700 prose-strong:text-gray-900 prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-ul:mb-4 prose-ol:mb-4 prose-li:mb-1">
+      <div set:html={renderedContent} />
+    </article>
 
     <!-- Article Footer -->
     <footer class="mt-12 pt-8 border-t border-gray-200">
