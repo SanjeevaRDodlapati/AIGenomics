@@ -47,7 +47,7 @@ const sortedPosts = posts.sort((a, b) => new Date(b.data.pubDate).valueOf() - ne
               <header class="mb-4">
                 <h2 class="text-2xl font-semibold text-gray-900 mb-2">
                   <a 
-                    href={`${baseUrl}/blog/${post.slug}`} 
+                    href={`${baseUrl}/blog/${post.id}`} 
                     class="hover:text-blue-600 transition-colors"
                   >
                     {post.data.title}
@@ -85,7 +85,7 @@ const sortedPosts = posts.sort((a, b) => new Date(b.data.pubDate).valueOf() - ne
               
               <footer>
                 <a 
-                  href={`${baseUrl}/blog/${post.slug}`} 
+                  href={`${baseUrl}/blog/${post.id}`} 
                   class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors"
                 >
                   Read More
