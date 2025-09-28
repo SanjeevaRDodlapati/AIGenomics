@@ -46,20 +46,62 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <h2 class="text-2xl font-semibold text-gray-900 mb-6">Publications</h2>
       <div class="space-y-6">
         <article class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900 mb-2">Sample Publication Title</h3>
-          <p class="text-sm text-gray-500 mb-3">Journal of AI Research • 2024</p>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Completing single-cell DNA methylome profiles via transfer learning together with KL-divergence</h3>
+          <p class="text-sm text-gray-500 mb-3">Frontiers in Genetics • 2022</p>
           <p class="text-gray-600 mb-4">
-            Abstract or brief description of the research paper. This would typically include the main findings,
-            methodology, and contributions to the field.
+            Developed a TensorFlow-based transfer learning framework for DNA methylation prediction from genomic sequence. 
+            Applied transfer learning to impute missing CpG states, boosting coverage from 1.5% to 50% in sparse methylomes.
           </p>
           <div class="flex space-x-4">
-            <a href="#" class="text-blue-600 hover:text-blue-700 text-sm font-medium">View Paper</a>
-            <a href="#" class="text-blue-600 hover:text-blue-700 text-sm font-medium">Citation</a>
+            <a href="https://doi.org/10.3389/fgene.2022.910439" target="_blank" class="text-blue-600 hover:text-blue-700 text-sm font-medium">View Paper</a>
+            <span class="text-gray-400">•</span>
+            <span class="text-sm text-gray-600">Authors: S. Dodlapati, Z. Jiang, J. Sun</span>
           </div>
         </article>
-        
-        <div class="text-center py-8">
-          <p class="text-gray-600">More publications coming soon. Check back for updates on recent research.</p>
+
+        <article class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">The landscape of accessible chromatin in quiescent cardiac fibroblasts and cardiac fibroblasts activated after myocardial infarction</h3>
+          <p class="text-sm text-gray-500 mb-3">Epigenetics • 2022</p>
+          <p class="text-gray-600 mb-4">
+            Collaborative research on RNA-seq analysis of cardiac fibroblasts post-MI, identifying compensatory upregulation patterns. 
+            Developed R pipelines for RNA-seq and ATAC-seq analysis to identify differentially expressed genes and open chromatin regions.
+          </p>
+          <div class="flex space-x-4">
+            <span class="text-sm text-gray-600">Authors: C. Li, J. Sun, Q. Liu, S. Dodlapati, H. Ming, L. Wang, Y. Li, R. Li, Z. Jiang, J. Francis, et al.</span>
+          </div>
+        </article>
+
+        <article class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Loss of acta2 in cardiac fibroblasts does not prevent the myofibroblast differentiation or affect the cardiac repair after myocardial infarction</h3>
+          <p class="text-sm text-gray-500 mb-3">Journal of Molecular and Cellular Cardiology • 2022</p>
+          <p class="text-gray-600 mb-4">
+            Investigation into cardiac fibroblast behavior and myofibroblast differentiation in myocardial infarction repair processes. 
+            Collaborative research with LSU examining compensatory mechanisms in cardiac tissue repair.
+          </p>
+          <div class="flex space-x-4">
+            <span class="text-sm text-gray-600">Authors: Y. Li, C. Li, Q. Liu, L. Wang, A. X. Bao, J. P. Jung, S. Dodlapati, J. Sun, P. Gao, X. Zhang, et al.</span>
+          </div>
+        </article>
+
+        <article class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Syntheses of bis-triazole linked carbohydrate based macrocycles and their applications for accelerating copper sulfate mediated click reaction</h3>
+          <p class="text-sm text-gray-500 mb-3">European Journal of Organic Chemistry • 2019</p>
+          <p class="text-gray-600 mb-4">
+            Research on synthetic methodology for carbohydrate-based macrocycles and their catalytic applications in click chemistry reactions. 
+            Focus on accelerating copper-mediated reactions through novel macrocyclic structures.
+          </p>
+          <div class="flex space-x-4">
+            <span class="text-sm text-gray-600">Authors: A. Chen, L. P. Samankumara, S. Dodlapati, D. Wang, S. Adhikari, G. Wang</span>
+          </div>
+        </article>
+
+        <div class="bg-blue-50 p-6 rounded-lg border border-blue-200">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">Manuscripts in Preparation</h3>
+          <ul class="space-y-2 text-gray-700">
+            <li><strong>Training Deep Neural Networks for DNA Methylation Prediction from DNA Sequence: A Data-centric Perspective</strong> - S. Dodlapati, J. Sun (under preparation)</li>
+            <li><strong>Uncertainty-Aware Variant Effect Prediction for Genome-wide Prioritization of Non-coding Variants</strong> - S. Dodlapati, J. Sun (under preparation)</li>
+            <li><strong>Learning more diverse genomic representations through hinge loss function</strong> - H. Du, S. Dodlapati, Z. Parsons, J. Sun, J. Lu (under preparation)</li>
+          </ul>
         </div>
       </div>
     </section>
@@ -68,20 +110,57 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <h2 class="text-2xl font-semibold text-gray-900 mb-6">Current Projects</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900 mb-3">AI Science Portfolio</h3>
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">OmicsOracle: AI Data Agent</h3>
           <p class="text-gray-600 mb-4">
-            Development of this academic portfolio site using modern web technologies
-            and best practices for scientific communication.
+            Developing an AI data agent that extracts genomic data from NCBI GEO, analyzes it, extracts insights, 
+            and provides visualizations. Focus on automating the genomic data analysis pipeline.
           </p>
           <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Active</span>
         </div>
         
         <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900 mb-3">Research Project 2</h3>
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">UAVarPrior: Uncertainty-Aware Variant Prioritization</h3>
           <p class="text-gray-600 mb-4">
-            Placeholder for upcoming research project. Details will be added as work progresses.
+            Developing frameworks for uncertainty quantification in genomic variant effect prediction, 
+            reducing computational costs by 80% while improving accuracy in variant prioritization.
           </p>
-          <span class="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Planning</span>
+          <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Active</span>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">ClinicalNormBERT</h3>
+          <p class="text-gray-600 mb-4">
+            Developing a BERT model for personalized clinical text normalization, improving data extraction 
+            in healthcare applications and clinical decision support systems.
+          </p>
+          <span class="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Development</span>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">Molecular Optimization Framework</h3>
+          <p class="text-gray-600 mb-4">
+            Building a comprehensive framework for molecular optimization and quantum machine learning 
+            for drug discovery, integrating chemical knowledge graphs and property prediction.
+          </p>
+          <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">Research</span>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">Genomic Representations via Hinge Loss</h3>
+          <p class="text-gray-600 mb-4">
+            Collaborative project with UMich applying deep learning for identifying genome-wide variants 
+            influencing DNA methylation, developing more diverse genomic representations.
+          </p>
+          <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Collaborative</span>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">3D Protein Structure Prediction</h3>
+          <p class="text-gray-600 mb-4">
+            Training UNet models to predict 3D protein structures from cryo-EM data, achieving performance 
+            on par with existing methods while reducing computational requirements.
+          </p>
+          <span class="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Development</span>
         </div>
       </div>
     </section>

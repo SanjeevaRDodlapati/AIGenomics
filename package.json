@@ -1,7 +1,7 @@
 {
-  "name": "ai-science-portfolio",
+  "name": "ai4science",
   "version": "1.0.0",
-  "description": "> Modern, interactive portfolio and blog platform for AI research, bioinformatics, and computational biology",
+  "description": "AI4Science - Modern portfolio and research platform for AI in Science, bioinformatics, and computational biology",
   "main": "index.js",
   "directories": {
     "doc": "docs"
